@@ -9,7 +9,7 @@
   let current=0,timer=null,startX=0,startY=0;
   function showSlide(index){
     current=(index+slides.length)%slides.length;
-    track.style.transform=`translateX(${current*100}%)`;
+    track.style.transform=`translateX(-${current*100}%)`;
     slides.forEach((s,i)=>s.classList.toggle('is-active',i===current));
     dots.forEach((d,i)=>{d.classList.toggle('is-active',i===current);d.setAttribute('aria-current',i===current?'true':'false')});
   }
