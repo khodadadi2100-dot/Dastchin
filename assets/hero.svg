@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-label="محصولات تازه دستچین و پیک تحویل کالا">
+<defs>
+ <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#cce8f7"/><stop offset="1" stop-color="#f4f8f2"/></linearGradient>
+ <linearGradient id="field" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#86b968"/><stop offset="1" stop-color="#d5e99a"/></linearGradient>
+ <linearGradient id="road" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#c4b096"/><stop offset="1" stop-color="#f5eee1"/></linearGradient>
+ <filter id="shadow"><feDropShadow dx="0" dy="12" stdDeviation="10" flood-opacity=".18"/></filter>
+</defs>
+<rect width="1200" height="520" fill="url(#sky)"/>
+<path d="M0 230 Q180 115 360 230 T720 210 T1200 180 V520 H0Z" fill="#78a98a" opacity=".7"/>
+<path d="M0 290 Q190 170 390 290 T780 255 T1200 220 V520 H0Z" fill="url(#field)"/>
+<g opacity=".65" fill="#5f935e"><circle cx="80" cy="335" r="48"/><circle cx="150" cy="315" r="65"/><circle cx="1050" cy="300" r="62"/><circle cx="1140" cy="320" r="80"/></g>
+<path d="M620 520 C600 435 630 365 760 330 C890 294 1050 315 1200 270 L1200 520Z" fill="url(#road)"/>
+<path d="M785 520 C775 445 820 400 900 378 C1000 350 1090 350 1200 325" fill="none" stroke="#fff" stroke-width="10" stroke-dasharray="38 30" opacity=".9"/>
+<g filter="url(#shadow)" transform="translate(790 250)">
+ <circle cx="70" cy="175" r="35" fill="#202b2c"/><circle cx="70" cy="175" r="16" fill="#a9b6b3"/>
+ <circle cx="250" cy="175" r="35" fill="#202b2c"/><circle cx="250" cy="175" r="16" fill="#a9b6b3"/>
+ <path d="M75 170 L125 112 L205 112 L248 170 L215 170 L190 137 L142 137 L110 170Z" fill="#08734f"/>
+ <path d="M125 112 L145 65 L198 65 L210 112Z" fill="#153d2d"/>
+ <rect x="136" y="18" width="88" height="85" rx="10" fill="#0b704e"/><rect x="147" y="30" width="66" height="55" rx="7" fill="#e8f5ed"/>
+ <path d="M163 59 l15 -16 8 10 14 -17 8 26z" fill="#08734f"/>
+ <circle cx="170" cy="4" r="20" fill="#13865f"/><path d="M155 1 Q171 -28 194 -5 L191 8 L160 13Z" fill="#174a2e"/>
+ <path d="M110 80 Q78 96 68 124" fill="none" stroke="#193a30" stroke-width="14" stroke-linecap="round"/>
+</g>
+<g filter="url(#shadow)" transform="translate(55 285)">
+ <rect x="0" y="95" width="160" height="75" rx="18" fill="#fff"/><rect x="22" y="0" width="70" height="145" rx="20" fill="#fff"/>
+ <rect x="34" y="18" width="46" height="80" rx="12" fill="#eef7f1"/><path d="M46 35 h22 v45 h-22z" fill="#08734f"/>
+ <rect x="106" y="75" width="75" height="85" rx="16" fill="#fff"/><path d="M116 100 Q143 78 170 100 V142 H116Z" fill="#f1dba7"/>
+ <circle cx="40" cy="157" r="18" fill="#79a85e"/><circle cx="145" cy="160" r="17" fill="#79a85e"/>
+</g>
+</svg>
