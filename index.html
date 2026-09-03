@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#006b4f" />
+  <meta name="description" content="دستچین؛ فروشگاه اینترنتی محصولات تازه با ارسال سریع" />
+  <title>دستچین | محصولات تازه و باکیفیت</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <button class="icon-btn profile-btn" aria-label="حساب کاربری">♙</button>
+      <button class="cart-btn" id="cartButton" aria-label="سبد خرید"><span>🛒</span><b id="cartCount">0</b></button>
+      <a class="brand" href="#home" aria-label="دستچین">
+        <div class="brand-mark">🛵</div>
+        <div><strong>دستچین</strong><small>🍃 چِشِش تازه؛ دستچین با ما 🍃</small></div>
+      </a>
+      <button class="menu-btn" id="menuButton" aria-label="منو"><i></i><i></i><i></i></button>
+    </header>
+
+    <main id="home">
+      <section class="hero" aria-label="پیشنهاد ویژه">
+        <div class="hero-art">
+          <div class="hero-copy">
+            <span>محصولات تازه و باکیفیت</span>
+            <h1>مستقیم تا خانه <em>♥</em> شما</h1>
+            <p>محصولات تازه، انتخاب‌شده و آماده ارسال با پیک دستچین</p>
+          </div>
+          <div class="road">〰〰〰</div>
+          <div class="delivery-rider">🛵</div>
+          <div class="fresh-products"><span>🥛</span><span>🧀</span><span>🥣</span></div>
+        </div>
+        <div class="slider-dots"><b></b><i></i><i></i></div>
+      </section>
+
+      <section class="search-wrap">
+        <label class="search-box"><input id="searchInput" type="search" placeholder="جستجوی محصولات لبنی، پروتئینی و ..." /><span>⌕</span></label>
+      </section>
+
+      <section class="categories" aria-label="دسته‌بندی محصولات">
+        <button class="category active" data-category="همه"><span>▦</span><b>همه</b></button>
+        <button class="category" data-category="محلی"><span>🧺</span><b>محلی</b></button>
+        <button class="category" data-category="شورجات"><span>🥒</span><b>شورجات</b></button>
+        <button class="category" data-category="پروتئین"><span>🥩</span><b>پروتئین</b></button>
+        <button class="category" data-category="نوشیدنی"><span>🥛</span><b>نوشیدنی</b></button>
+        <button class="category" data-category="لبنیات"><span>🍼</span><b>لبنیات</b></button>
+      </section>
+
+      <section class="products-section">
+        <div class="section-head"><a href="#products">مشاهده همه ←</a><h2>محصولات دستچین</h2></div>
+        <div class="products" id="products"></div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="ناوبری اصلی">
+      <a href="#account"><span>♙</span><small>حساب من</small></a>
+      <a href="#tracking"><span>◷</span><small>پیگیری سفارش</small></a>
+      <a href="#cart" id="bottomCart"><span class="cart-icon">🛒<b id="bottomCartCount">0</b></span><small>سبد خرید</small></a>
+      <a href="#products"><span>▦</span><small>محصولات</small></a>
+      <a class="selected" href="#home"><span>⌂</span><small>خانه</small></a>
+    </nav>
+  </div>
+
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <button class="drawer-close" id="drawerClose">×</button>
+    <div class="drawer-brand">دستچین</div>
+    <a href="#home">خانه</a><a href="#products">محصولات</a><a href="#tracking">پیگیری سفارش</a><a href="#account">حساب کاربری</a>
+    <hr><a href="#admin">پنل مدیریت</a>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
