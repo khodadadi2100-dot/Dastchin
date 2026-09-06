@@ -17,7 +17,7 @@
       img.loading = 'eager';
       img.decoding = 'async';
       const src = img.getAttribute('src') || '';
-      if (src && !src.includes('?')) img.src = `${src}?v=4`;
+      if (src && !src.includes('?')) img.src = `${src}?v=5`;
     }
   });
   const render = (nextIndex, animate = true) => {
@@ -31,14 +31,13 @@
   };
   const stop = () => { if (timer) clearTimeout(timer); timer = null; };
   const start = () => { stop(); timer = setTimeout(() => { render(index + 1); start(); }, delay); };
-  const restart = () => { render(index); start(); };
   prev?.addEventListener('click', () => { render(index - 1); start(); });
   next?.addEventListener('click', () => { render(index + 1); start(); });
   dots.forEach(dot => dot.addEventListener('click', () => { render(Number(dot.dataset.slide)); start(); }));
   root.addEventListener('mouseenter', stop); root.addEventListener('mouseleave', start); root.addEventListener('focusin', stop); root.addEventListener('focusout', e => { if (!root.contains(e.relatedTarget)) start(); });
   viewport?.addEventListener('touchstart', e => { const t = e.changedTouches[0]; touchStartX = t.clientX; touchStartY = t.clientY; stop(); }, { passive: true });
   viewport?.addEventListener('touchend', e => { const t = e.changedTouches[0], dx = t.clientX - touchStartX, dy = t.clientY - touchStartY; if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) render(index + (dx < 0 ? 1 : -1)); start(); }, { passive: true });
-  root.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { e.preventDefault(); render(index - 1); restart(); } if (e.key === 'ArrowLeft') { e.preventDefault(); render(index + 1); restart(); } });
+  root.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { e.preventDefault(); render(index - 1); start(); } if (e.key === 'ArrowLeft') { e.preventDefault(); render(index + 1); start(); } });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else start(); });
   render(0, false); start();
 })();
