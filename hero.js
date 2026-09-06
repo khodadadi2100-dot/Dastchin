@@ -1,4 +1,4 @@
-/* Dastchin Hero — rebuilt from scratch */
+/* Dastchin Hero — reliable image fallback + slider */
 (() => {
   const root = document.querySelector('.hero-section');
   if (!root) return;
@@ -11,32 +11,59 @@
   const progress = root.querySelector('.hero-progress span');
   const delay = 5000;
   let index = 0, timer = null, touchStartX = 0, touchStartY = 0;
+
+  const embedded = [window.DASTCHIN_HERO_DIRECT, window.DASTCHIN_HERO_BRAND, null];
   slides.forEach((slide, i) => {
     const img = slide.querySelector('img');
-    if (img && i < 2) {
-      img.loading = 'eager'; img.decoding = 'async';
-      const src = img.getAttribute('src') || '';
-      if (src && !src.includes('?')) img.src = `${src}?v=7`;
-    }
+    if (!img) return;
+    img.loading = 'eager';
+    img.decoding = 'async';
+    if (embedded[i]) img.src = embedded[i];
   });
+
   const render = (nextIndex, animate = true) => {
     index = (nextIndex + slides.length) % slides.length;
     track.style.transition = animate ? '' : 'none';
     track.style.transform = `translate3d(-${index * 100}%,0,0)`;
     slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
-    dots.forEach((dot, i) => { const active = i === index; dot.classList.toggle('active', active); dot.setAttribute('aria-current', active ? 'true' : 'false'); });
-    root.classList.remove('is-playing'); void root.offsetWidth; root.classList.add('is-playing');
-    if (progress) { progress.style.animation = 'none'; void progress.offsetWidth; progress.style.animation = ''; }
+    dots.forEach((dot, i) => {
+      const active = i === index;
+      dot.classList.toggle('active', active);
+      dot.setAttribute('aria-current', active ? 'true' : 'false');
+    });
+    root.classList.remove('is-playing');
+    void root.offsetWidth;
+    root.classList.add('is-playing');
+    if (progress) {
+      progress.style.animation = 'none';
+      void progress.offsetWidth;
+      progress.style.animation = '';
+    }
   };
+
   const stop = () => { if (timer) clearTimeout(timer); timer = null; };
   const start = () => { stop(); timer = setTimeout(() => { render(index + 1); start(); }, delay); };
   prev?.addEventListener('click', () => { render(index - 1); start(); });
   next?.addEventListener('click', () => { render(index + 1); start(); });
   dots.forEach(dot => dot.addEventListener('click', () => { render(Number(dot.dataset.slide)); start(); }));
-  root.addEventListener('mouseenter', stop); root.addEventListener('mouseleave', start); root.addEventListener('focusin', stop); root.addEventListener('focusout', e => { if (!root.contains(e.relatedTarget)) start(); });
-  viewport?.addEventListener('touchstart', e => { const t = e.changedTouches[0]; touchStartX = t.clientX; touchStartY = t.clientY; stop(); }, { passive: true });
-  viewport?.addEventListener('touchend', e => { const t = e.changedTouches[0], dx = t.clientX - touchStartX, dy = t.clientY - touchStartY; if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) render(index + (dx < 0 ? 1 : -1)); start(); }, { passive: true });
-  root.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { e.preventDefault(); render(index - 1); start(); } if (e.key === 'ArrowLeft') { e.preventDefault(); render(index + 1); start(); } });
+  root.addEventListener('mouseenter', stop);
+  root.addEventListener('mouseleave', start);
+  root.addEventListener('focusin', stop);
+  root.addEventListener('focusout', e => { if (!root.contains(e.relatedTarget)) start(); });
+  viewport?.addEventListener('touchstart', e => {
+    const t = e.changedTouches[0];
+    touchStartX = t.clientX; touchStartY = t.clientY; stop();
+  }, { passive: true });
+  viewport?.addEventListener('touchend', e => {
+    const t = e.changedTouches[0], dx = t.clientX - touchStartX, dy = t.clientY - touchStartY;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) render(index + (dx < 0 ? 1 : -1));
+    start();
+  }, { passive: true });
+  root.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); render(index - 1); start(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); render(index + 1); start(); }
+  });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else start(); });
-  render(0, false); start();
+  render(0, false);
+  start();
 })();
