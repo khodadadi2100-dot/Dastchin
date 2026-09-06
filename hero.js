@@ -1,4 +1,4 @@
-/* Dastchin Hero — reliable image fallback + slider */
+/* Dastchin Hero — responsive slider with exact image framing */
 (() => {
   const root = document.querySelector('.hero-section');
   if (!root) return;
@@ -21,6 +21,24 @@
     if (embedded[i]) img.src = embedded[i];
   });
 
+  const syncMobileHeight = () => {
+    if (!viewport || !slides[index]) return;
+    if (window.matchMedia('(max-width: 700px)').matches) {
+      const img = slides[index].querySelector('img');
+      if (!img) return;
+      const setHeight = () => {
+        const width = viewport.clientWidth;
+        if (img.naturalWidth && img.naturalHeight && width) {
+          viewport.style.height = `${Math.round(width * img.naturalHeight / img.naturalWidth)}px`;
+        }
+      };
+      if (img.complete) setHeight();
+      else img.addEventListener('load', setHeight, { once: true });
+    } else {
+      viewport.style.height = '';
+    }
+  };
+
   const render = (nextIndex, animate = true) => {
     index = (nextIndex + slides.length) % slides.length;
     track.style.transition = animate ? '' : 'none';
@@ -31,6 +49,7 @@
       dot.classList.toggle('active', active);
       dot.setAttribute('aria-current', active ? 'true' : 'false');
     });
+    syncMobileHeight();
     root.classList.remove('is-playing');
     void root.offsetWidth;
     root.classList.add('is-playing');
@@ -63,6 +82,7 @@
     if (e.key === 'ArrowRight') { e.preventDefault(); render(index - 1); start(); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); render(index + 1); start(); }
   });
+  window.addEventListener('resize', syncMobileHeight, { passive: true });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else start(); });
   render(0, false);
   start();
