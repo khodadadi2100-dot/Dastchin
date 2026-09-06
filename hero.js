@@ -17,7 +17,7 @@
       img.loading = 'eager';
       img.decoding = 'async';
       const src = img.getAttribute('src') || '';
-      if (src && !src.includes('?')) img.src = `${src}?v=3`;
+      if (src && !src.includes('?')) img.src = `${src}?v=4`;
     }
   });
   const render = (nextIndex, animate = true) => {
