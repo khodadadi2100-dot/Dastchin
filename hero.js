@@ -14,10 +14,9 @@
   slides.forEach((slide, i) => {
     const img = slide.querySelector('img');
     if (img && i < 2) {
-      img.loading = 'eager';
-      img.decoding = 'async';
+      img.loading = 'eager'; img.decoding = 'async';
       const src = img.getAttribute('src') || '';
-      if (src && !src.includes('?')) img.src = `${src}?v=6`;
+      if (src && !src.includes('?')) img.src = `${src}?v=7`;
     }
   });
   const render = (nextIndex, animate = true) => {
