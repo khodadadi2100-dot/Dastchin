@@ -1,4 +1,4 @@
-/* Dastchin Hero — responsive slider with exact image framing */
+/* Dastchin Hero — production binary WebP slider */
 (() => {
   const root = document.querySelector('.hero-section');
   if (!root) return;
@@ -10,22 +10,26 @@
   const next = root.querySelector('[data-hero-next]');
   const progress = root.querySelector('.hero-progress span');
   const delay = 5000;
+  const sources = [
+    'assets/dastchin_5x2_1.webp',
+    'assets/dastchin_5x2_2.webp',
+    'dastchin_5x2_3.webp'
+  ];
   let index = 0, timer = null, touchStartX = 0, touchStartY = 0;
 
-  const embedded = [window.DASTCHIN_HERO_DIRECT, window.DASTCHIN_HERO_BRAND, null];
   slides.forEach((slide, i) => {
     const img = slide.querySelector('img');
-    if (!img) return;
-    img.loading = 'eager';
+    if (!img || !sources[i]) return;
+    img.src = sources[i];
+    img.loading = i === 0 ? 'eager' : 'lazy';
     img.decoding = 'async';
-    if (embedded[i]) img.src = embedded[i];
   });
 
   const syncMobileHeight = () => {
     if (!viewport || !slides[index]) return;
+    const img = slides[index].querySelector('img');
+    if (!img) return;
     if (window.matchMedia('(max-width: 700px)').matches) {
-      const img = slides[index].querySelector('img');
-      if (!img) return;
       const setHeight = () => {
         const width = viewport.clientWidth;
         if (img.naturalWidth && img.naturalHeight && width) {
