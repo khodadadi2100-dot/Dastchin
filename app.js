@@ -64,3 +64,17 @@ document.getElementById('menuButton').addEventListener('click',()=>{drawer.class
 document.getElementById('drawerClose').addEventListener('click',closeDrawer);overlay.addEventListener('click',closeDrawer);
 document.querySelectorAll('.drawer a').forEach(a=>a.addEventListener('click',closeDrawer));
 render();
+
+/* Header repair: load the final reference-matching stylesheet after legacy CSS. */
+(function repairDastchinHeader(){
+  const link=document.createElement('link');
+  link.rel='stylesheet';
+  link.href='header-fix.css?v=1';
+  document.head.appendChild(link);
+  const logo=document.querySelector('.brand-logo');
+  if(logo){logo.src='assets/dastchin-logo.webp?v=2';logo.alt='لوگوی دستچین';}
+  const account=document.querySelector('.round-action .account-icon');
+  if(account){account.innerHTML='<svg class="account-svg" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle cx="24" cy="15.5" r="7"></circle><path d="M10 39c1.8-8 7.1-12 14-12s12.2 4 14 12"></path></svg>';}
+  const cartIcon=document.querySelector('.cart-action span');
+  if(cartIcon){cartIcon.innerHTML='<svg class="cart-svg" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path d="M6 9h6l4.5 22h22L43 16H14"></path><circle cx="20" cy="39" r="3"></circle><circle cx="36" cy="39" r="3"></circle></svg>';}
+})();
