@@ -28,4 +28,4 @@ input?.addEventListener('input',render);clear?.addEventListener('click',()=>{inp
 const drawer=document.getElementById('drawer'),overlay=document.getElementById('overlay');
 function closeDrawer(){drawer.classList.remove('open');overlay.classList.remove('show');drawer.setAttribute('aria-hidden','true')}
 document.getElementById('menuButton').addEventListener('click',()=>{drawer.classList.add('open');overlay.classList.add('show');drawer.setAttribute('aria-hidden','false')});document.getElementById('drawerClose').addEventListener('click',closeDrawer);overlay.addEventListener('click',closeDrawer);document.querySelectorAll('.drawer a').forEach(a=>a.addEventListener('click',closeDrawer));render();
-(function loadHeaderFix(){const link=document.createElement('link');link.rel='stylesheet';link.href='header-fix.css?v=101';document.head.appendChild(link);})();
+(function loadHeaderFix(){const link=document.createElement('link');link.rel='stylesheet';link.href='header-fix.css?v=303';document.head.appendChild(link);})();
