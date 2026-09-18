@@ -38,7 +38,7 @@ function render(){
   const rawQuery=input?.value||'';
   const list=products.filter(p=>(activeCategory==='همه'||p.category===activeCategory)&&matches(p,rawQuery));
   grid.innerHTML=list.length?list.map((p,i)=>`<article class="product"><div class="product-img">${p.tag?`<span class="product-tag">${p.tag}</span>`:''}${p.icon}</div><div class="product-body"><h3>${p.name}</h3><p>${p.weight}</p><div class="price-row"><div><div class="price">${money(p.price)}</div>${p.oldPrice?`<div class="old-price">${money(p.oldPrice)}</div>`:''}</div><span aria-hidden="true">♡</span></div><button class="add" data-index="${i}">افزودن به سبد</button></div></article>`).join(''):`<div class="empty-state"><strong>محصولی پیدا نشد</strong><span>عبارت جستجو یا دسته‌بندی را تغییر بده.</span></div>`;
-  grid.querySelectorAll('.add').forEach(btn=>btn.addEventListener('click',()=>{cart++;count.textContent=cart;bottomCount.textContent=cart;btn.textContent='✓ به سبد اضافه شد';btn.disabled=true;setTimeout(()=>{btn.textContent='افزودن به سبد';btn.disabled=false},800)}));
+  grid.querySelectorAll('.add').forEach(btn=>btn.addEventListener('click',()=>{cart++;count.textContent=cart;bottomCount.textContent=cart;syncDrawerCart();btn.textContent='✓ به سبد اضافه شد';btn.disabled=true;setTimeout(()=>{btn.textContent='افزودن به سبد';btn.disabled=false},800)}));
   if(status){
     const q=rawQuery.trim();
     status.textContent=q||activeCategory!=='همه'?`${list.length.toLocaleString('fa-IR')} محصول نمایش داده شد${activeCategory!=='همه'?` · دسته: ${activeCategory}`:''}`:`${products.length.toLocaleString('fa-IR')} محصول آماده نمایش است`;
@@ -54,6 +54,7 @@ document.querySelectorAll('.category').forEach(btn=>btn.addEventListener('click'
   render();
   document.getElementById('products')?.scrollIntoView({behavior:'smooth',block:'start'});
 }));
+document.querySelectorAll('[data-menu-category]').forEach(link=>link.addEventListener('click',()=>{const category=link.dataset.menuCategory;const target=document.querySelector(`.category[data-category="${category}"]`);if(target)target.click();}));
 input?.addEventListener('input',render);
 clear?.addEventListener('click',()=>{input.value='';render();input.focus()});
 input?.addEventListener('keydown',e=>{if(e.key==='Escape'){input.value='';render();input.blur()}});
@@ -64,6 +65,9 @@ document.getElementById('menuButton').addEventListener('click',()=>{drawer.class
 document.getElementById('drawerClose').addEventListener('click',closeDrawer);overlay.addEventListener('click',closeDrawer);
 document.querySelectorAll('.drawer a').forEach(a=>a.addEventListener('click',closeDrawer));
 render();
+const drawerCartCount=document.getElementById('drawerCartCount');
+function syncDrawerCart(){if(drawerCartCount)drawerCartCount.textContent=cart}
+syncDrawerCart();
 
 /* Header repair: restore both visible header icons without changing the header layout. */
 (function repairHeaderIcons(){
