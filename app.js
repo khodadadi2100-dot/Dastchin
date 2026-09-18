@@ -1,109 +1,46 @@
 const products=[
-{name:'پنیر محلی',weight:'۱ کیلوگرم',price:220000,oldPrice:280000,category:'محلی',icon:'🧀',image:'assets/product-cheese.svg',tag:'ویژه'},
-{name:'دوغ تازه',weight:'۱.۵ کیلوگرم',price:96000,category:'نوشیدنی',icon:'🥛',tag:'تازه',image:'assets/product-doogh.svg'},
-{name:'ماست پرچرب',weight:'۱.۵ کیلوگرم',price:153000,category:'لبنیات',icon:'🥣',tag:'پرفروش',image:'assets/product-yogurt.svg'},
-{name:'شیر محلی',weight:'۱ لیتر',price:76000,category:'لبنیات',icon:'🍼',tag:'تازه',image:'assets/product-milk.svg'},
-{name:'خیارشور ویژه',weight:'۱ کیلوگرم',price:128000,category:'شورجات',icon:'🥒',tag:'ویژه',image:'assets/product-pickle.svg'},
-{name:'گوشت تازه',weight:'۱ کیلوگرم',price:540000,category:'پروتئین',icon:'🥩',tag:'تازه',image:'assets/product-meat.svg'},
-{name:'کشک محلی',weight:'۵۰۰ گرم',price:89000,category:'لبنیات',icon:'🥛',image:'assets/product-kashk.svg'},
-{name:'زیتون محلی',weight:'۵۰۰ گرم',price:165000,category:'محلی',icon:'🫒',image:'assets/product-olive.svg'}
+{id:'p1',name:'پنیر محلی',weight:'۱ کیلوگرم',price:220000,oldPrice:280000,category:'محلی',icon:'🧀',image:'assets/product-cheese.svg',tag:'ویژه',stock:18,description:'پنیر محلی تازه با طعم اصیل و بافت نرم.'},
+{id:'p2',name:'دوغ تازه',weight:'۱.۵ کیلوگرم',price:96000,category:'نوشیدنی',icon:'🥛',image:'assets/product-doogh.svg',tag:'تازه',stock:24,description:'دوغ تازه و خنک با طعم سنتی.'},
+{id:'p3',name:'ماست پرچرب',weight:'۱.۵ کیلوگرم',price:153000,category:'لبنیات',icon:'🥣',image:'assets/product-yogurt.svg',tag:'پرفروش',stock:16,description:'ماست پرچرب با بافت غلیظ و طعم ملایم.'},
+{id:'p4',name:'شیر محلی',weight:'۱ لیتر',price:76000,category:'لبنیات',icon:'🍼',image:'assets/product-milk.svg',tag:'تازه',stock:30,description:'شیر محلی تازه برای مصرف روزانه.'},
+{id:'p5',name:'خیارشور ویژه',weight:'۱ کیلوگرم',price:128000,category:'شورجات',icon:'🥒',image:'assets/product-pickle.svg',tag:'ویژه',stock:12,description:'خیارشور ترد و خوش‌طعم با مزه متعادل.'},
+{id:'p6',name:'گوشت تازه',weight:'۱ کیلوگرم',price:540000,category:'پروتئین',icon:'🥩',image:'assets/product-meat.svg',tag:'تازه',stock:9,description:'گوشت تازه با بسته‌بندی مناسب.'},
+{id:'p7',name:'کشک محلی',weight:'۵۰۰ گرم',price:89000,category:'لبنیات',icon:'🥛',image:'assets/product-kashk.svg',stock:20,description:'کشک محلی با طعم سنتی.'},
+{id:'p8',name:'زیتون محلی',weight:'۵۰۰ گرم',price:165000,category:'محلی',icon:'🫒',image:'assets/product-olive.svg',stock:14,description:'زیتون محلی خوش‌طعم.'}
 ];
-let cart=0,activeCategory='همه';
-const grid=document.getElementById('productsGrid');
-const count=document.getElementById('cartCount');
-const bottomCount=document.getElementById('bottomCartCount');
-const input=document.getElementById('searchInput');
-const clear=document.getElementById('clearSearch');
-const searchWrap=document.querySelector('.search-wrap');
-const status=document.createElement('div');
-status.className='search-status';
-status.setAttribute('aria-live','polite');
-searchWrap?.appendChild(status);
-
-function normalize(value=''){
-  return String(value)
-    .replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/ۀ/g,'ه')
-    .replace(/[أإٱ]/g,'ا').replace(/ؤ/g,'و').replace(/‌/g,' ')
-    .replace(/[۰-۹]/g,d=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
-    .replace(/[٠-٩]/g,d=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)))
-    .replace(/[\s\-_/]+/g,' ').trim().toLowerCase();
-}
-function money(n){return n.toLocaleString('fa-IR')+' تومان'}
-function matches(product,query){
-  if(!query)return true;
-  const haystack=normalize(`${product.name} ${product.category} ${product.weight} ${product.tag||''}`);
-  return normalize(query).split(' ').filter(Boolean).every(word=>haystack.includes(word));
-}
-function render(){
-  const rawQuery=input?.value||'';
-  const list=products.filter(p=>(activeCategory==='همه'||p.category===activeCategory)&&matches(p,rawQuery));
-  grid.innerHTML=list.length?list.map((p,i)=>`<article class="product"><div class="product-img">${p.tag?`<span class="product-tag">${p.tag}</span>`:''}${p.icon}</div><div class="product-body"><h3>${p.name}</h3><p>${p.weight}</p><div class="price-row"><div><div class="price">${money(p.price)}</div>${p.oldPrice?`<div class="old-price">${money(p.oldPrice)}</div>`:''}</div><span aria-hidden="true">♡</span></div><button class="add" data-index="${i}">افزودن به سبد</button></div></article>`).join(''):`<div class="empty-state"><strong>محصولی پیدا نشد</strong><span>عبارت جستجو یا دسته‌بندی را تغییر بده.</span></div>`;
-  grid.querySelectorAll('.add').forEach(btn=>btn.addEventListener('click',()=>{cart++;count.textContent=cart;bottomCount.textContent=cart;syncDrawerCart();btn.textContent='✓ به سبد اضافه شد';btn.disabled=true;setTimeout(()=>{btn.textContent='افزودن به سبد';btn.disabled=false},800)}));
-  if(status){
-    const q=rawQuery.trim();
-    status.textContent=q||activeCategory!=='همه'?`${list.length.toLocaleString('fa-IR')} محصول نمایش داده شد${activeCategory!=='همه'?` · دسته: ${activeCategory}`:''}`:`${products.length.toLocaleString('fa-IR')} محصول آماده نمایش است`;
-    status.classList.toggle('has-filter',Boolean(q||activeCategory!=='همه'));
-  }
-  if(clear)clear.style.display=rawQuery?'block':'none';
-}
-
-document.querySelectorAll('.category').forEach(btn=>btn.addEventListener('click',()=>{
-  document.querySelectorAll('.category').forEach(x=>x.classList.remove('active'));
-  btn.classList.add('active');
-  activeCategory=btn.dataset.category||'همه';
-  render();
-  document.getElementById('products')?.scrollIntoView({behavior:'smooth',block:'start'});
-}));
-document.querySelectorAll('[data-menu-category]').forEach(link=>link.addEventListener('click',()=>{const category=link.dataset.menuCategory;const target=document.querySelector(`.category[data-category="${category}"]`);if(target)target.click();}));
-input?.addEventListener('input',render);
-clear?.addEventListener('click',()=>{input.value='';render();input.focus()});
-input?.addEventListener('keydown',e=>{if(e.key==='Escape'){input.value='';render();input.blur()}});
-
-const drawer=document.getElementById('drawer'),overlay=document.getElementById('overlay');
-function closeDrawer(){drawer.classList.remove('open');overlay.classList.remove('show');drawer.setAttribute('aria-hidden','true')}
-document.getElementById('menuButton').addEventListener('click',()=>{drawer.classList.add('open');overlay.classList.add('show');drawer.setAttribute('aria-hidden','false')});
-document.getElementById('drawerClose').addEventListener('click',closeDrawer);overlay.addEventListener('click',closeDrawer);
-document.querySelectorAll('.drawer a').forEach(a=>a.addEventListener('click',closeDrawer));
-render();
-const drawerCartCount=document.getElementById('drawerCartCount');
-function syncDrawerCart(){if(drawerCartCount)drawerCartCount.textContent=cart}
-syncDrawerCart();
-
-/* Header repair: restore both visible header icons without changing the header layout. */
-(function repairHeaderIcons(){
-  const cart=document.querySelector('.cart-action > span');
-  if(cart){
-    cart.innerHTML='<svg class="cart-svg" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path d="M7 9h5l4.2 22.5h21.6L42 16H13.2"></path><circle cx="20" cy="38" r="2.8"></circle><circle cx="35" cy="38" r="2.8"></circle></svg>';
-  }
-  const account=document.querySelector('.round-action .account-icon');
-  if(account){
-    account.innerHTML='<svg class="account-svg" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle cx="24" cy="14.5" r="7.2"></circle><path d="M11 38.5c1.7-7.2 6.3-11 13-11s11.3 3.8 13 11"></path></svg>';
-  }
-})();
-
-
-/* Product stage: details, stock indicator and quantity selection */
-products.forEach((p,i)=>{p.id=p.id||('p'+(i+1));p.stock=p.stock??20;p.description=p.description||('محصول تازه دستچین؛ '+p.name+' با کیفیت مناسب مصرف روزانه و بسته‌بندی مناسب عرضه می‌شود.')});
-function openProduct(product){const modal=document.getElementById('productModal');if(!modal||!product)return;modal.querySelector('[data-modal-icon]').textContent=product.icon;modal.querySelector('[data-modal-tag]').textContent=product.tag||'محصول دستچین';modal.querySelector('[data-modal-name]').textContent=product.name;modal.querySelector('[data-modal-weight]').textContent=product.weight;modal.querySelector('[data-modal-description]').textContent=product.description;modal.querySelector('[data-modal-price]').textContent=money(product.price);modal.querySelector('[data-modal-stock]').textContent=product.stock>0?'موجود · '+product.stock.toLocaleString('fa-IR')+' عدد':'ناموجود';modal.querySelector('[data-modal-old-price]').textContent=product.oldPrice?money(product.oldPrice):'';modal.querySelector('[data-qty]').value=1;modal.querySelector('[data-add-detail]').dataset.productId=product.id;modal.classList.add('show');modal.setAttribute('aria-hidden','false')}
-function closeProduct(){const modal=document.getElementById('productModal');if(!modal)return;modal.classList.remove('show');modal.setAttribute('aria-hidden','true')}
-const productStageRender=render;render=function(){const rawQuery=input?.value||'';const list=products.filter(p=>(activeCategory==='همه'||p.category===activeCategory)&&matches(p,rawQuery));grid.innerHTML=list.length?list.map(p=>'<article class="product" data-product-id="'+p.id+'"><button class="product-image-button" type="button" data-product-detail="'+p.id+'" aria-label="مشاهده جزئیات '+p.name+'"><div class="product-img">'+(p.tag?'<span class="product-tag">'+p.tag+'</span>':'')+p.image?'<img class="product-photo" src="'+p.image+'" alt="'+p.name+'" loading="lazy">':p.icon+'</div></button><div class="product-body"><button class="product-title-button" type="button" data-product-detail="'+p.id+'"><h3>'+p.name+'</h3><p>'+p.weight+'</p></button><div class="price-row"><div><div class="price">'+money(p.price)+'</div>'+(p.oldPrice?'<div class="old-price">'+money(p.oldPrice)+'</div>':'')+'</div><span class="product-stock">'+(p.stock>0?'موجود':'ناموجود')+'</span></div><button class="add" data-add-product="'+p.id+'" '+(p.stock<1?'disabled':'')+'>'+(p.stock>0?'افزودن به سبد':'ناموجود')+'</button></div></article>').join(''):'<div class="empty-state"><strong>محصولی پیدا نشد</strong><span>عبارت جستجو یا دسته‌بندی را تغییر بده.</span></div>';grid.querySelectorAll('[data-product-detail]').forEach(b=>b.addEventListener('click',()=>openProduct(products.find(p=>p.id===b.dataset.productDetail))));grid.querySelectorAll('[data-add-product]').forEach(b=>b.addEventListener('click',()=>{const p=products.find(x=>x.id===b.dataset.addProduct);if(!p||p.stock<1)return;cart++;count.textContent=cart;bottomCount.textContent=cart;syncDrawerCart();b.textContent='✓ به سبد اضافه شد';b.disabled=true;setTimeout(()=>{b.textContent=p.stock>0?'افزودن به سبد':'ناموجود';b.disabled=p.stock<1},800)}));if(status){const q=rawQuery.trim();status.textContent=q||activeCategory!=='همه'?list.length.toLocaleString('fa-IR')+' محصول نمایش داده شد'+(activeCategory!=='همه'?' · دسته: '+activeCategory:''):products.length.toLocaleString('fa-IR')+' محصول آماده نمایش است';status.classList.toggle('has-filter',Boolean(q||activeCategory!=='همه'))}if(clear)clear.style.display=rawQuery?'block':'none'};
-const productModal=document.getElementById('productModal');productModal?.querySelector('[data-modal-close]')?.addEventListener('click',closeProduct);productModal?.querySelector('[data-modal-overlay]')?.addEventListener('click',closeProduct);productModal?.querySelector('[data-qty-minus]')?.addEventListener('click',()=>{const q=productModal.querySelector('[data-qty]');q.value=Math.max(1,Number(q.value||1)-1)});productModal?.querySelector('[data-qty-plus]')?.addEventListener('click',()=>{const p=products.find(x=>x.id===productModal.querySelector('[data-add-detail]')?.dataset.productId);const q=productModal.querySelector('[data-qty]');q.value=Math.min(p?.stock||1,Number(q.value||1)+1)});productModal?.querySelector('[data-add-detail]')?.addEventListener('click',()=>{const p=products.find(x=>x.id===productModal.querySelector('[data-add-detail]').dataset.productId);const q=Math.max(1,Math.min(p?.stock||1,Number(productModal.querySelector('[data-qty]').value||1)));if(!p||p.stock<1)return;cart+=q;count.textContent=cart;bottomCount.textContent=cart;syncDrawerCart();closeProduct()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProduct()});
-render();
-
-
-/* Cart stage */
+let activeCategory='همه';
 const cartItems=new Map();
-function syncCart(){const total=[...cartItems.values()].reduce((s,x)=>s+x.qty,0);cart=total;count.textContent=total;bottomCount.textContent=total;syncDrawerCart();renderCart();}
+const grid=document.getElementById('productsGrid'),count=document.getElementById('cartCount'),bottomCount=document.getElementById('bottomCartCount'),input=document.getElementById('searchInput'),clear=document.getElementById('clearSearch'),searchWrap=document.querySelector('.search-wrap');
+const status=document.createElement('div');status.className='search-status';status.setAttribute('aria-live','polite');searchWrap?.appendChild(status);
+function normalize(v=''){return String(v).replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/ۀ/g,'ه').replace(/[۰-۹]/g,d=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[\s\-_/]+/g,' ').trim().toLowerCase()}
+function money(n){return n.toLocaleString('fa-IR')+' تومان'}
+function matches(p,q){if(!q)return true;const h=normalize(p.name+' '+p.category+' '+p.weight+' '+(p.tag||'')+' '+p.description);return normalize(q).split(' ').filter(Boolean).every(w=>h.includes(w))}
+function cartCount(){return [...cartItems.values()].reduce((s,x)=>s+x.qty,0)}
+function syncCart(){const n=cartCount();count.textContent=n;bottomCount.textContent=n;const d=document.getElementById('drawerCartCount');if(d)d.textContent=n;renderCart()}
 function addToCart(id,qty=1){const p=products.find(x=>x.id===id);if(!p||p.stock<1)return;const item=cartItems.get(id)||{product:p,qty:0};item.qty=Math.min(p.stock,item.qty+qty);cartItems.set(id,item);syncCart()}
-function changeCartQty(id,delta){const item=cartItems.get(id);if(!item)return;item.qty=Math.max(0,Math.min(item.product.stock,item.qty+delta));if(!item.qty)cartItems.delete(id);syncCart()}
-function removeCart(id){cartItems.delete(id);syncCart()}
-function renderCart(){const box=document.getElementById('cartItems');const totalEl=document.getElementById('cartTotal');if(!box)return;const items=[...cartItems.values()];box.innerHTML=items.length?items.map(x=>'<article class="cart-item"><img src="'+(x.product.image||'')+'" alt="'+x.product.name+'"><div><strong>'+x.product.name+'</strong><small>'+x.product.weight+'</small><b>'+money(x.product.price*x.qty)+'</b></div><div class="cart-item-actions"><button type="button" data-cart-minus="'+x.product.id+'">−</button><span>'+x.qty.toLocaleString('fa-IR')+'</span><button type="button" data-cart-plus="'+x.product.id+'">+</button><button class="cart-remove" type="button" data-cart-remove="'+x.product.id+'">حذف</button></div></article>').join(''):'<div class="cart-empty"><strong>سبد خرید خالی است</strong><span>محصولات موردنظرت را از فروشگاه انتخاب کن.</span></div>';const total=items.reduce((s,x)=>s+x.product.price*x.qty,0);if(totalEl)totalEl.textContent=money(total);box.querySelectorAll('[data-cart-minus]').forEach(b=>b.onclick=()=>changeCartQty(b.dataset.cartMinus,-1));box.querySelectorAll('[data-cart-plus]').forEach(b=>b.onclick=()=>changeCartQty(b.dataset.cartPlus,1));box.querySelectorAll('[data-cart-remove]').forEach(b=>b.onclick=()=>removeCart(b.dataset.cartRemove))}
-function openCart(){const m=document.getElementById('cartModal');if(!m)return;renderCart();m.classList.add('show');m.setAttribute('aria-hidden','false')}
-function closeCart(){const m=document.getElementById('cartModal');if(!m)return;m.classList.remove('show');m.setAttribute('aria-hidden','true')}
-document.querySelectorAll('a[href="#cart"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();closeDrawer();openCart()}));
-grid?.addEventListener('click',e=>{const b=e.target.closest('[data-add-product]');if(!b)return;e.stopImmediatePropagation();addToCart(b.dataset.addProduct,1)},true);
-productModal?.addEventListener('click',e=>{const b=e.target.closest('[data-add-detail]');if(!b)return;e.stopImmediatePropagation();addToCart(b.dataset.productId,Number(productModal.querySelector('[data-qty]').value||1));closeProduct()},true);
-document.getElementById('cartModal')?.querySelector('[data-cart-close]')?.addEventListener('click',closeCart);
-document.getElementById('cartModal')?.querySelector('[data-cart-overlay]')?.addEventListener('click',closeCart);
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCart()});
-renderCart();
+function changeQty(id,delta){const item=cartItems.get(id);if(!item)return;item.qty=Math.max(0,Math.min(item.product.stock,item.qty+delta));if(!item.qty)cartItems.delete(id);syncCart()}
+function render(){
+ const q=input?.value||'';const list=products.filter(p=>(activeCategory==='همه'||p.category===activeCategory)&&matches(p,q));
+ grid.innerHTML=list.length?list.map(p=>'<article class="product"><button class="product-image-button" type="button" data-detail="'+p.id+'"><div class="product-img">'+(p.tag?'<span class="product-tag">'+p.tag+'</span>':'')+'<img class="product-photo" src="'+p.image+'" alt="'+p.name+'" loading="lazy"></div></button><div class="product-body"><button class="product-title-button" type="button" data-detail="'+p.id+'"><h3>'+p.name+'</h3><p>'+p.weight+'</p></button><div class="price-row"><div><div class="price">'+money(p.price)+'</div>'+(p.oldPrice?'<div class="old-price">'+money(p.oldPrice)+'</div>':'')+'</div><span class="product-stock">'+(p.stock?'موجود':'ناموجود')+'</span></div><button class="add" data-add="'+p.id+'" '+(!p.stock?'disabled':'')+'>'+ (p.stock?'افزودن به سبد':'ناموجود')+'</button></div></article>').join(''):'<div class="empty-state"><strong>محصولی پیدا نشد</strong><span>عبارت جستجو یا دسته‌بندی را تغییر بده.</span></div>';
+ grid.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>openProduct(products.find(p=>p.id===b.dataset.detail)));
+ grid.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{addToCart(b.dataset.add);b.textContent='✓ به سبد اضافه شد';setTimeout(()=>b.textContent='افزودن به سبد',800)});
+ status.textContent=q||activeCategory!=='همه'?list.length.toLocaleString('fa-IR')+' محصول نمایش داده شد'+(activeCategory!=='همه'?' · دسته: '+activeCategory:''):products.length.toLocaleString('fa-IR')+' محصول آماده نمایش است';
+ if(clear)clear.style.display=q?'block':'none';
+}
+function openProduct(p){const m=document.getElementById('productModal');if(!m||!p)return;m.querySelector('[data-modal-icon]').innerHTML='<img class="modal-product-photo" src="'+p.image+'" alt="'+p.name+'">';m.querySelector('[data-modal-tag]').textContent=p.tag||'محصول دستچین';m.querySelector('[data-modal-name]').textContent=p.name;m.querySelector('[data-modal-weight]').textContent=p.weight;m.querySelector('[data-modal-description]').textContent=p.description;m.querySelector('[data-modal-price]').textContent=money(p.price);m.querySelector('[data-modal-old-price]').textContent=p.oldPrice?money(p.oldPrice):'';m.querySelector('[data-modal-stock]').textContent=p.stock?'موجود · '+p.stock.toLocaleString('fa-IR')+' عدد':'ناموجود';m.querySelector('[data-qty]').value=1;m.querySelector('[data-add-detail]').dataset.productId=p.id;m.classList.add('show');m.setAttribute('aria-hidden','false')}
+function closeProduct(){const m=document.getElementById('productModal');if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true')}}
+function renderCart(){const box=document.getElementById('cartItems'),totalEl=document.getElementById('cartTotal');if(!box)return;const items=[...cartItems.values()];box.innerHTML=items.length?items.map(x=>'<article class="cart-item"><img src="'+x.product.image+'" alt="'+x.product.name+'"><div><strong>'+x.product.name+'</strong><small>'+x.product.weight+'</small><b>'+money(x.product.price*x.qty)+'</b></div><div class="cart-item-actions"><button data-cart-minus="'+x.product.id+'">−</button><span>'+x.qty.toLocaleString('fa-IR')+'</span><button data-cart-plus="'+x.product.id+'">+</button><button class="cart-remove" data-cart-remove="'+x.product.id+'">حذف</button></div></article>').join(''):'<div class="cart-empty"><strong>سبد خرید خالی است</strong><span>محصولات موردنظرت را انتخاب کن.</span></div>';const total=items.reduce((s,x)=>s+x.product.price*x.qty,0);if(totalEl)totalEl.textContent=money(total);box.querySelectorAll('[data-cart-minus]').forEach(b=>b.onclick=()=>changeQty(b.dataset.cartMinus,-1));box.querySelectorAll('[data-cart-plus]').forEach(b=>b.onclick=()=>changeQty(b.dataset.cartPlus,1));box.querySelectorAll('[data-cart-remove]').forEach(b=>b.onclick=()=>{cartItems.delete(b.dataset.cartRemove);syncCart()})}
+function openCart(){const m=document.getElementById('cartModal');if(m){renderCart();m.classList.add('show');m.setAttribute('aria-hidden','false')}}
+function closeCart(){const m=document.getElementById('cartModal');if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true')}}
+document.querySelectorAll('.category').forEach(b=>b.onclick=()=>{document.querySelectorAll('.category').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeCategory=b.dataset.category||'همه';render();document.getElementById('products')?.scrollIntoView({behavior:'smooth',block:'start'})});
+document.querySelectorAll('[data-menu-category]').forEach(a=>a.onclick=()=>{document.querySelector('.category[data-category="'+a.dataset.menuCategory+'"]')?.click()});
+input?.addEventListener('input',render);clear?.addEventListener('click',()=>{input.value='';render();input.focus()});
+document.querySelectorAll('a[href="#cart"]').forEach(a=>a.onclick=e=>{e.preventDefault();closeDrawer();openCart()});
+document.getElementById('cartModal')?.querySelector('[data-cart-close]')?.addEventListener('click',closeCart);document.getElementById('cartModal')?.querySelector('[data-cart-overlay]')?.addEventListener('click',closeCart);
+document.getElementById('productModal')?.querySelector('[data-modal-close]')?.addEventListener('click',closeProduct);document.getElementById('productModal')?.querySelector('[data-modal-overlay]')?.addEventListener('click',closeProduct);
+document.getElementById('productModal')?.querySelector('[data-qty-minus]')?.addEventListener('click',()=>{const q=document.querySelector('[data-qty]');q.value=Math.max(1,Number(q.value)-1)});
+document.getElementById('productModal')?.querySelector('[data-qty-plus]')?.addEventListener('click',()=>{const m=document.getElementById('productModal'),p=products.find(x=>x.id===m.querySelector('[data-add-detail]').dataset.productId),q=m.querySelector('[data-qty]');q.value=Math.min(p.stock,Number(q.value)+1)});
+document.getElementById('productModal')?.querySelector('[data-add-detail]')?.addEventListener('click',()=>{const m=document.getElementById('productModal'),p=products.find(x=>x.id===m.querySelector('[data-add-detail]').dataset.productId);addToCart(p.id,Number(m.querySelector('[data-qty]').value));closeProduct()});
+const drawer=document.getElementById('drawer'),overlay=document.getElementById('overlay');function closeDrawer(){drawer?.classList.remove('open');overlay?.classList.remove('show');drawer?.setAttribute('aria-hidden','true')}document.getElementById('menuButton')?.addEventListener('click',()=>{drawer?.classList.add('open');overlay?.classList.add('show');drawer?.setAttribute('aria-hidden','false')});document.getElementById('drawerClose')?.addEventListener('click',closeDrawer);overlay?.addEventListener('click',closeDrawer);document.querySelectorAll('.drawer a').forEach(a=>a.addEventListener('click',closeDrawer));
+(function(){const c=document.querySelector('.cart-action>span');if(c)c.innerHTML='<svg class="cart-svg" viewBox="0 0 48 48"><path d="M7 9h5l4.2 22.5h21.6L42 16H13.2"></path><circle cx="20" cy="38" r="2.8"></circle><circle cx="35" cy="38" r="2.8"></circle></svg>';const a=document.querySelector('.round-action .account-icon');if(a)a.innerHTML='<svg class="account-svg" viewBox="0 0 48 48"><circle cx="24" cy="14.5" r="7.2"></circle><path d="M11 38.5c1.7-7.2 6.3-11 13-11s11.3 3.8 13 11"></path></svg>'})();
+render();syncCart();
