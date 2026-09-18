@@ -1,0 +1,20 @@
+/* Dastchin menu - navigation only */
+.drawer{padding:24px 20px 30px;overflow-y:auto}
+.drawer-head{margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.drawer-head>div{display:flex;flex-direction:column;gap:3px}
+.drawer-head strong{font-size:25px}
+.drawer-head small{font-size:11px;color:var(--muted);font-weight:600}
+.drawer-head button{width:42px;height:42px;border-radius:12px;background:#f1f7f4;color:var(--green);font-size:30px;line-height:1}
+.drawer-main{display:grid;gap:7px}
+.drawer-main a{position:relative;display:flex;align-items:center;gap:13px;padding:13px 12px;border:1px solid transparent;border-radius:13px;background:#f7faf8;color:var(--ink);text-decoration:none}
+.drawer-main a:hover{background:var(--green-soft);border-color:#dcebe5}
+.drawer-main span{width:30px;text-align:center;font-size:23px}
+.drawer-main b{font-size:14px}
+.drawer-main em{margin-right:auto;min-width:24px;height:24px;padding:0 6px;display:grid;place-items:center;background:var(--danger);color:#fff;border-radius:50%;font-size:10px;font-style:normal;font-weight:900}
+.drawer-section{margin-top:20px;padding-top:17px;border-top:1px solid var(--line)}
+.drawer-section h3{margin:0 5px 9px;color:var(--green);font-size:13px}
+.drawer-section>a{display:flex;align-items:center;gap:9px;padding:10px 7px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line);font-size:13px}
+.drawer-section>a:last-child{border-bottom:0}
+.drawer-section>a:hover{color:var(--green)}
+.drawer-support{padding-bottom:10px}
+@media(max-width:650px){.drawer{width:min(350px,90%);padding:20px 16px 25px}.drawer-head{margin-bottom:15px}.drawer-main a{padding:12px 10px}.drawer-section{margin-top:17px;padding-top:14px}}
