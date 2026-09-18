@@ -65,8 +65,12 @@ document.getElementById('drawerClose').addEventListener('click',closeDrawer);ove
 document.querySelectorAll('.drawer a').forEach(a=>a.addEventListener('click',closeDrawer));
 render();
 
-/* Header repair: only replace the account icon; all other header elements stay unchanged. */
-(function repairAccountIcon(){
+/* Header repair: restore both visible header icons without changing the header layout. */
+(function repairHeaderIcons(){
+  const cart=document.querySelector('.cart-action > span');
+  if(cart){
+    cart.innerHTML='<svg class="cart-svg" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path d="M7 9h5l4.2 22.5h21.6L42 16H13.2"></path><circle cx="20" cy="38" r="2.8"></circle><circle cx="35" cy="38" r="2.8"></circle></svg>';
+  }
   const account=document.querySelector('.round-action .account-icon');
   if(account){
     account.innerHTML='<svg class="account-svg" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle cx="24" cy="14.5" r="7.2"></circle><path d="M11 38.5c1.7-7.2 6.3-11 13-11s11.3 3.8 13 11"></path></svg>';
