@@ -10,3 +10,10 @@
 .category{min-width:150px}
 .category img{height:86px!important;object-fit:contain!important}
 @media(max-width:650px){.category{min-width:120px}.category img{height:68px!important}.product-brand-mark{width:58px;height:24px;bottom:5px;left:5px}.product-brand-mark img{width:54px;height:23px}}
+
+/* Supplied dairy sprite: each tile is one branded product image */
+.dairy-sprite{background-image:var(--dairy-sprite-image);background-repeat:no-repeat;background-size:400% 200%;background-color:#fff;background-position:var(--dairy-pos,0 0)}
+.dairy-d1{--dairy-pos:0 0}.dairy-d2{--dairy-pos:33.333% 0}.dairy-d3{--dairy-pos:66.666% 0}.dairy-d4{--dairy-pos:100% 0}.dairy-d5{--dairy-pos:0 100%}.dairy-d6{--dairy-pos:33.333% 100%}.dairy-d7{--dairy-pos:66.666% 100%}.dairy-d8{--dairy-pos:100% 100%}
+.product-img.dairy-sprite{height:230px;background-image:var(--dairy-sprite-image)!important;background-size:400% 200%!important;background-position:var(--dairy-pos)!important}
+.modal-sprite{width:210px;height:210px;background-image:var(--dairy-sprite-image);background-repeat:no-repeat;background-size:400% 200%;background-position:var(--dairy-pos)}
+.cart-sprite{width:76px;height:76px;border-radius:11px;background-image:var(--dairy-sprite-image);background-repeat:no-repeat;background-size:400% 200%;background-position:var(--dairy-pos);background-color:#f1f7f4}
