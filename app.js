@@ -1,12 +1,12 @@
 const products=[
-{id:'p1',name:'پنیر محلی',weight:'۱ کیلوگرم',price:220000,oldPrice:280000,category:'محلی',icon:'🧀',image:'assets/product-cheese.svg',tag:'ویژه',stock:18,description:'پنیر محلی تازه با طعم اصیل و بافت نرم.'},
-{id:'p2',name:'دوغ تازه',weight:'۱.۵ کیلوگرم',price:96000,category:'نوشیدنی',icon:'🥛',image:'assets/product-doogh.svg',tag:'تازه',stock:24,description:'دوغ تازه و خنک با طعم سنتی.'},
-{id:'p3',name:'ماست پرچرب',weight:'۱.۵ کیلوگرم',price:153000,category:'لبنیات',icon:'🥣',image:'assets/product-yogurt.svg',tag:'پرفروش',stock:16,description:'ماست پرچرب با بافت غلیظ و طعم ملایم.'},
-{id:'p4',name:'شیر محلی',weight:'۱ لیتر',price:76000,category:'لبنیات',icon:'🍼',image:'assets/product-milk.svg',tag:'تازه',stock:30,description:'شیر محلی تازه برای مصرف روزانه.'},
-{id:'p5',name:'خیارشور ویژه',weight:'۱ کیلوگرم',price:128000,category:'شورجات',icon:'🥒',image:'assets/product-pickle.svg',tag:'ویژه',stock:12,description:'خیارشور ترد و خوش‌طعم با مزه متعادل.'},
-{id:'p6',name:'گوشت تازه',weight:'۱ کیلوگرم',price:540000,category:'پروتئین',icon:'🥩',image:'assets/product-meat.svg',tag:'تازه',stock:9,description:'گوشت تازه با بسته‌بندی مناسب.'},
-{id:'p7',name:'کشک محلی',weight:'۵۰۰ گرم',price:89000,category:'لبنیات',icon:'🥛',image:'assets/product-kashk.svg',stock:20,description:'کشک محلی با طعم سنتی.'},
-{id:'p8',name:'زیتون محلی',weight:'۵۰۰ گرم',price:165000,category:'محلی',icon:'🫒',image:'assets/product-olive.svg',stock:14,description:'زیتون محلی خوش‌طعم.'}
+{id:'p1',name:'پنیر محلی',weight:'۱ کیلوگرم',price:220000,oldPrice:280000,category:'محلی',icon:'🧀',image:'https://altmanassets.s3.amazonaws.com/uploads/2016/12/ThinkstockPhotos-154059593.jpg',tag:'ویژه',stock:18,description:'پنیر محلی تازه با طعم اصیل و بافت نرم.'},
+{id:'p2',name:'دوغ تازه',weight:'۱.۵ کیلوگرم',price:96000,category:'نوشیدنی',icon:'🥛',image:'https://bazar-center.com/245695-large_default/%D9%83%D8%A7%D9%84%D8%A9_%D8%AF%D9%88%D8%BA_%D9%84%D8%A8%D9%86_%D8%A8%D8%B7%D9%84_%D8%A8%D9%84%D8%A7%D8%B3%D8%AA%D9%83_1_5_%D9%84%D8%AA%D8%B1__6.jpg',tag:'تازه',stock:24,description:'دوغ تازه و خنک با طعم سنتی.'},
+{id:'p3',name:'ماست پرچرب',weight:'۱.۵ کیلوگرم',price:153000,category:'لبنیات',icon:'🥣',image:'https://www.highshop.ir/images/items/L10794.gif',tag:'پرفروش',stock:16,description:'ماست پرچرب با بافت غلیظ و طعم ملایم.'},
+{id:'p4',name:'شیر محلی',weight:'۱ لیتر',price:76000,category:'لبنیات',icon:'🍼',image:'https://www.highshop.ir/images/items/L11010.gif',tag:'تازه',stock:30,description:'شیر محلی تازه برای مصرف روزانه.'},
+{id:'p5',name:'خیارشور ویژه',weight:'۱ کیلوگرم',price:128000,category:'شورجات',icon:'🥒',image:'https://unbama.it/img/m/20263/42/%D8%AE%DB%8C%D8%A7%D8%B1%D8%B4%D9%88%D8%B1-%D8%AF%D8%B1%D8%AC%D9%87-1-%D8%B1%D8%A7%D8%B2%DA%A9-760-%DA%AF%D8%B1%D9%85.jpg?v=60683000',tag:'ویژه',stock:12,description:'خیارشور ترد و خوش‌طعم با مزه متعادل.'},
+{id:'p6',name:'گوشت تازه',weight:'۱ کیلوگرم',price:540000,category:'پروتئین',icon:'🥩',image:'https://mir-s3-cdn-cf.behance.net/project_modules/fs/1630b214428759.56283c4199bf8.jpg',tag:'تازه',stock:9,description:'گوشت تازه با بسته‌بندی مناسب.'},
+{id:'p7',name:'کشک محلی',weight:'۵۰۰ گرم',price:89000,category:'لبنیات',icon:'🥛',image:'https://fsn1.your-objectstorage.com/aradbranding-fa-uploads/topics/16752469226044.jpg',stock:20,description:'کشک محلی با طعم سنتی.'},
+{id:'p8',name:'زیتون محلی',weight:'۵۰۰ گرم',price:165000,category:'محلی',icon:'🫒',image:'https://www.sorinaco.com/static/images/products/1/green_olive_Jars-1.png',stock:14,description:'زیتون محلی خوش‌طعم.'}
 ];
 let activeCategory='همه';
 const cartItems=new Map();
@@ -16,7 +16,11 @@ function normalize(v=''){return String(v).replace(/[يى]/g,'ی').replace(/ك/g,
 function money(n){return n.toLocaleString('fa-IR')+' تومان'}
 function matches(p,q){if(!q)return true;const h=normalize(p.name+' '+p.category+' '+p.weight+' '+(p.tag||'')+' '+p.description);return normalize(q).split(' ').filter(Boolean).every(w=>h.includes(w))}
 function cartCount(){return [...cartItems.values()].reduce((s,x)=>s+x.qty,0)}
-function syncCart(){const n=cartCount();count.textContent=n;bottomCount.textContent=n;const d=document.getElementById('drawerCartCount');if(d)d.textContent=n;renderCart()}
+const CART_KEY='dastchin_cart_v2';
+const savedCart=(()=>{try{return JSON.parse(localStorage.getItem(CART_KEY)||'[]')}catch(e){return[]}})();
+savedCart.forEach(x=>{const p=products.find(p=>p.id===x.id);if(p&&x.qty>0)cartItems.set(x.id,{product:p,qty:Math.min(p.stock,x.qty)})});
+function persistCart(){localStorage.setItem(CART_KEY,JSON.stringify([...cartItems.values()].map(x=>({id:x.product.id,qty:x.qty}))))}
+function syncCart(){const n=cartCount();if(count)count.textContent=n;if(bottomCount)bottomCount.textContent=n;const d=document.getElementById('drawerCartCount');if(d)d.textContent=n;persistCart();renderCart()}
 function addToCart(id,qty=1){const p=products.find(x=>x.id===id);if(!p||p.stock<1)return;const item=cartItems.get(id)||{product:p,qty:0};item.qty=Math.min(p.stock,item.qty+qty);cartItems.set(id,item);syncCart()}
 function changeQty(id,delta){const item=cartItems.get(id);if(!item)return;item.qty=Math.max(0,Math.min(item.product.stock,item.qty+delta));if(!item.qty)cartItems.delete(id);syncCart()}
 function render(){
@@ -35,7 +39,8 @@ function closeCart(){const m=document.getElementById('cartModal');if(m){m.classL
 document.querySelectorAll('.category').forEach(b=>b.onclick=()=>{document.querySelectorAll('.category').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeCategory=b.dataset.category||'همه';render();document.getElementById('products')?.scrollIntoView({behavior:'smooth',block:'start'})});
 document.querySelectorAll('[data-menu-category]').forEach(a=>a.onclick=()=>{document.querySelector('.category[data-category="'+a.dataset.menuCategory+'"]')?.click()});
 input?.addEventListener('input',render);clear?.addEventListener('click',()=>{input.value='';render();input.focus()});
-document.querySelectorAll('a[href="#cart"]').forEach(a=>a.onclick=e=>{e.preventDefault();closeDrawer();openCart()});
+document.querySelectorAll('a[href="#cart"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeDrawer();openCart()}));
+document.addEventListener('click',e=>{const trigger=e.target.closest('a[href="#cart"],[data-open-cart]');if(trigger){e.preventDefault();e.stopPropagation();closeDrawer();openCart()}});
 document.getElementById('cartModal')?.querySelector('[data-cart-close]')?.addEventListener('click',closeCart);document.getElementById('cartModal')?.querySelector('[data-cart-overlay]')?.addEventListener('click',closeCart);
 document.getElementById('productModal')?.querySelector('[data-modal-close]')?.addEventListener('click',closeProduct);document.getElementById('productModal')?.querySelector('[data-modal-overlay]')?.addEventListener('click',closeProduct);
 document.getElementById('productModal')?.querySelector('[data-qty-minus]')?.addEventListener('click',()=>{const q=document.querySelector('[data-qty]');q.value=Math.max(1,Number(q.value)-1)});
