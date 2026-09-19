@@ -1,12 +1,12 @@
 const products=[
-{id:'d1',name:'ماست محلی',weight:'۱ کیلوگرم',price:18000,category:'لبنیات',image:'https://www.gettyimages.com/',tag:'تازه',stock:25,description:'ماست محلی تازه و خوش‌طعم با بافت نرم و طعم سنتی.'},
-{id:'d2',name:'ماست چکیده',weight:'۱ کیلوگرم',price:32000,category:'لبنیات',image:'https://www.gettyimages.com/',tag:'ویژه',stock:18,description:'ماست چکیده غلیظ و خوش‌طعم مناسب صبحانه و غذاهای محلی.'},
-{id:'d3',name:'ماست و موسیر',weight:'۵۰۰ گرم',price:21000,category:'لبنیات',image:'https://www.gettyimages.com/',tag:'پرفروش',stock:20,description:'ماست و موسیر با طعم متعادل و عطر موسیر.'},
-{id:'d4',name:'پنیر فله ای',weight:'۵۰۰ گرم',price:33000,category:'لبنیات',image:'https://rimibaltic-res.cloudinary.com/image/upload/b_white%2Cc_limit%2Cdpr_auto%2Cf_auto%2Cq_auto%3Alow%2Cw_auto/d_ecommerce%3Abackend-fallback.png/MAT_4009683_KGM_LV',tag:'تازه',stock:16,description:'پنیر فله‌ای تازه با طعم اصیل و مناسب صبحانه.'},
-{id:'d5',name:'کره محلی',weight:'۲۵۰ گرم',price:27000,category:'لبنیات',image:'https://www.gettyimages.com/',tag:'محلی',stock:14,description:'کره محلی خوش‌عطر و مناسب صبحانه و پخت‌وپز.'},
-{id:'d6',name:'شیر',weight:'۱ لیتر',price:38000,category:'لبنیات',image:'https://www.gettyimages.com/',tag:'تازه',stock:30,description:'شیر تازه روزانه با طعم طبیعی.'},
-{id:'d7',name:'دوغ',weight:'۱.۵ لیتر',price:18000,category:'لبنیات',image:'https://www.gettyimages.com/',tag:'تازه',stock:28,description:'دوغ سنتی خنک و خوش‌طعم.'},
-{id:'d8',name:'کشک سنتی',weight:'۵۰۰ گرم',price:28000,category:'لبنیات',image:'https://cupofyum.com/uploads/images/000/080/098/80098-homemade-kashk-a5b3455ef9f31047ad920bd7f24ca40e.jpg',tag:'سنتی',stock:15,description:'کشک سنتی با طعم اصیل و مناسب غذاهای ایرانی.'}
+{id:'d1',name:'ماست محلی',weight:'۱ کیلوگرم',price:18000,category:'لبنیات',image:'https://commons.wikimedia.org/wiki/Special:FilePath/Yogurt_(2).jpg',tag:'تازه',stock:25,description:'ماست محلی تازه و خوش‌طعم با بافت نرم و طعم سنتی.'},
+{id:'d2',name:'ماست چکیده',weight:'۱ کیلوگرم',price:32000,category:'لبنیات',image:'https://commons.wikimedia.org/wiki/Special:FilePath/Yogurt_(3763030578).jpg',tag:'ویژه',stock:18,description:'ماست چکیده غلیظ و خوش‌طعم مناسب صبحانه و غذاهای محلی.'},
+{id:'d3',name:'ماست و موسیر',weight:'۵۰۰ گرم',price:21000,category:'لبنیات',image:'https://commons.wikimedia.org/wiki/Special:FilePath/Yogurt_(3590812581).jpg',tag:'پرفروش',stock:20,description:'ماست و موسیر با طعم متعادل و عطر موسیر.'},
+{id:'d4',name:'پنیر فله ای',weight:'۵۰۰ گرم',price:33000,category:'لبنیات',image:'https://commons.wikimedia.org/wiki/Special:FilePath/Cheese_(14094456372).jpg',tag:'تازه',stock:16,description:'پنیر فله‌ای تازه با طعم اصیل و مناسب صبحانه.'},
+{id:'d5',name:'کره محلی',weight:'۲۵۰ گرم',price:27000,category:'لبنیات',image:'https://commons.wikimedia.org/wiki/Special:FilePath/Butter_(25220923218).jpg',tag:'محلی',stock:14,description:'کره محلی خوش‌عطر و مناسب صبحانه و پخت‌وپز.'},
+{id:'d6',name:'شیر',weight:'۱ لیتر',price:38000,category:'لبنیات',image:'https://commons.wikimedia.org/wiki/Special:FilePath/Milk_(24299977096).jpg',tag:'تازه',stock:30,description:'شیر تازه روزانه با طعم طبیعی.'},
+{id:'d7',name:'دوغ',weight:'۱.۵ لیتر',price:18000,category:'لبنیات',image:'https://commons.wikimedia.org/wiki/Special:FilePath/Milk_(24299977096).jpg',tag:'تازه',stock:28,description:'دوغ سنتی خنک و خوش‌طعم.'},
+{id:'d8',name:'کشک سنتی',weight:'۵۰۰ گرم',price:28000,category:'لبنیات',image:'https://commons.wikimedia.org/wiki/Special:FilePath/DairyProductsGermany.jpg',tag:'سنتی',stock:15,description:'کشک سنتی با طعم اصیل و مناسب غذاهای ایرانی.'}
 ];
 
 const CART_KEY='dastchin_cart_v3';
