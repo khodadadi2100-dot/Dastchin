@@ -1,12 +1,12 @@
 const products=[
-{id:'d1',name:'ماست محلی',weight:'۱ کیلوگرم',price:18000,category:'لبنیات',image:'https://www.highshop.ir/images/items/L10794.gif',tag:'تازه',stock:25,description:'ماست محلی تازه و خوش‌طعم با بافت نرم و طعم سنتی.'},
-{id:'d2',name:'ماست چکیده',weight:'۱ کیلوگرم',price:32000,category:'لبنیات',image:'https://www.highshop.ir/images/items/L10794.gif',tag:'ویژه',stock:18,description:'ماست چکیده غلیظ و خوش‌طعم مناسب صبحانه و غذاهای محلی.'},
-{id:'d3',name:'ماست و موسیر',weight:'۵۰۰ گرم',price:21000,category:'لبنیات',image:'https://fsn1.your-objectstorage.com/aradbranding-fa-uploads/topics/16752469226044.jpg',tag:'پرفروش',stock:20,description:'ماست و موسیر با طعم متعادل و عطر موسیر.'},
-{id:'d4',name:'پنیر فله ای',weight:'۵۰۰ گرم',price:33000,category:'لبنیات',image:'https://altmanassets.s3.amazonaws.com/uploads/2016/12/ThinkstockPhotos-154059593.jpg',tag:'تازه',stock:16,description:'پنیر فله‌ای تازه با طعم اصیل و مناسب صبحانه.'},
-{id:'d5',name:'کره محلی',weight:'۲۵۰ گرم',price:27000,category:'لبنیات',image:'https://www.highshop.ir/images/items/L10794.gif',tag:'محلی',stock:14,description:'کره محلی خوش‌عطر و مناسب صبحانه و پخت‌وپز.'},
-{id:'d6',name:'شیر',weight:'۱ لیتر',price:38000,category:'لبنیات',image:'https://www.highshop.ir/images/items/L11010.gif',tag:'تازه',stock:30,description:'شیر تازه روزانه با طعم طبیعی.'},
-{id:'d7',name:'دوغ',weight:'۱.۵ لیتر',price:18000,category:'لبنیات',image:'https://bazar-center.com/245695-large_default/%D9%83%D8%A7%D9%84%D8%A9_%D8%AF%D9%88%D8%BA_%D9%84%D8%A8%D9%86_%D8%A8%D8%B7%D9%84_%D8%A8%D9%84%D8%A7%D8%B3%D8%AA%D9%8A%D9%83_1_5_%D9%84%D8%AA%D8%B1__6.jpg',tag:'تازه',stock:28,description:'دوغ سنتی خنک و خوش‌طعم.'},
-{id:'d8',name:'کشک سنتی',weight:'۵۰۰ گرم',price:28000,category:'لبنیات',image:'https://fsn1.your-objectstorage.com/aradbranding-fa-uploads/topics/16752469226044.jpg',tag:'سنتی',stock:15,description:'کشک سنتی با طعم اصیل و مناسب غذاهای ایرانی.'}
+{id:'d1',name:'ماست محلی',weight:'۱ کیلوگرم',price:18000,category:'لبنیات',image:'https://www.gettyimages.com/',tag:'تازه',stock:25,description:'ماست محلی تازه و خوش‌طعم با بافت نرم و طعم سنتی.'},
+{id:'d2',name:'ماست چکیده',weight:'۱ کیلوگرم',price:32000,category:'لبنیات',image:'https://www.gettyimages.com/',tag:'ویژه',stock:18,description:'ماست چکیده غلیظ و خوش‌طعم مناسب صبحانه و غذاهای محلی.'},
+{id:'d3',name:'ماست و موسیر',weight:'۵۰۰ گرم',price:21000,category:'لبنیات',image:'https://www.gettyimages.com/',tag:'پرفروش',stock:20,description:'ماست و موسیر با طعم متعادل و عطر موسیر.'},
+{id:'d4',name:'پنیر فله ای',weight:'۵۰۰ گرم',price:33000,category:'لبنیات',image:'https://rimibaltic-res.cloudinary.com/image/upload/b_white%2Cc_limit%2Cdpr_auto%2Cf_auto%2Cq_auto%3Alow%2Cw_auto/d_ecommerce%3Abackend-fallback.png/MAT_4009683_KGM_LV',tag:'تازه',stock:16,description:'پنیر فله‌ای تازه با طعم اصیل و مناسب صبحانه.'},
+{id:'d5',name:'کره محلی',weight:'۲۵۰ گرم',price:27000,category:'لبنیات',image:'https://www.gettyimages.com/',tag:'محلی',stock:14,description:'کره محلی خوش‌عطر و مناسب صبحانه و پخت‌وپز.'},
+{id:'d6',name:'شیر',weight:'۱ لیتر',price:38000,category:'لبنیات',image:'https://www.gettyimages.com/',tag:'تازه',stock:30,description:'شیر تازه روزانه با طعم طبیعی.'},
+{id:'d7',name:'دوغ',weight:'۱.۵ لیتر',price:18000,category:'لبنیات',image:'https://www.gettyimages.com/',tag:'تازه',stock:28,description:'دوغ سنتی خنک و خوش‌طعم.'},
+{id:'d8',name:'کشک سنتی',weight:'۵۰۰ گرم',price:28000,category:'لبنیات',image:'https://cupofyum.com/uploads/images/000/080/098/80098-homemade-kashk-a5b3455ef9f31047ad920bd7f24ca40e.jpg',tag:'سنتی',stock:15,description:'کشک سنتی با طعم اصیل و مناسب غذاهای ایرانی.'}
 ];
 
 const CART_KEY='dastchin_cart_v3';
@@ -46,7 +46,7 @@ function openCart(){const m=document.getElementById('cartModal');if(m){renderCar
 function closeCart(){const m=document.getElementById('cartModal');if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');document.body.classList.remove('cart-open')}}
 
 function wireCartTrigger(el){el?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeDrawer();openCart()})}
-document.querySelectorAll('[data-open-cart],a[href="#cart"]').forEach(wireCartTrigger);
+document.querySelectorAll('[data-open-cart],a[href="#cart"]').forEach(wireCartTrigger);document.addEventListener('click',e=>{const t=e.target.closest('[data-open-cart],a[href="#cart"]');if(!t)return;e.preventDefault();e.stopImmediatePropagation();closeDrawer();openCart()},true);document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCart();closeProduct();closeDrawer()}});
 
 const drawer=document.getElementById('drawer'),overlay=document.getElementById('overlay');
 function closeDrawer(){drawer?.classList.remove('open');overlay?.classList.remove('show');drawer?.setAttribute('aria-hidden','true')}
@@ -55,7 +55,7 @@ document.getElementById('drawerClose')?.addEventListener('click',closeDrawer);
 overlay?.addEventListener('click',closeDrawer);
 document.querySelectorAll('.drawer a').forEach(a=>a.addEventListener('click',e=>{if(a.matches('a[href="#cart"]'))return;closeDrawer()}));
 
-document.querySelectorAll('.category').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();document.querySelectorAll('.category').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeCategory='لبنیات';render()}));
+document.querySelectorAll('.category').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();document.querySelectorAll('.category').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeCategory=b.dataset.category;render()}));
 input?.addEventListener('input',render);
 clear?.addEventListener('click',()=>{input.value='';render();input.focus()});
 document.getElementById('cartModal')?.querySelector('[data-cart-close]')?.addEventListener('click',closeCart);
