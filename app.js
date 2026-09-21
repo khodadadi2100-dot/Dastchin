@@ -33,7 +33,7 @@ function matches(p,q){if(!q)return true;const h=normalize(p.name+' '+p.category+
 function spriteClass(id){return 'dairy-sprite dairy-'+id}
 function render(){
  const q=input?.value||'';
- const list=products.filter(p=>p.category===activeCategory&&matches(p,q));
+ const list=products.filter(p=>(activeCategory==='همه'||p.category===activeCategory)&&matches(p,q));
  grid.innerHTML=list.length?list.map(p=>'<article class="product"><button class="product-image-button" type="button" data-detail="'+p.id+'"><div class="product-img">'+(p.tag?'<span class="product-tag">'+p.tag+'</span>':'')+'<img class="product-photo" src="'+p.image+'" alt="'+p.name+'" loading="lazy" onerror="this.onerror=null;this.src=window.DAIRY_SPRITE||\'assets/dastchin-logo.webp\'">'+ '<span class="product-brand-mark"><img src="assets/dastchin-logo.webp" alt="دستچین" aria-hidden="true"></span></div></button><div class="product-body"><button class="product-title-button" type="button" data-detail="'+p.id+'"><h3>'+p.name+'</h3><p>'+p.weight+'</p></button><div class="price-row"><div><div class="price">'+money(p.price)+'</div></div><span class="product-stock">'+(p.stock?'موجود':'ناموجود')+'</span></div><button class="add" data-add="'+p.id+'" '+(!p.stock?'disabled':'')+'>'+ (p.stock?'افزودن به سبد 🛒':'ناموجود')+'</button></div></article>').join(''):'<div class="empty-state"><strong>محصولی پیدا نشد</strong><span>عبارت جستجو را تغییر بده.</span></div>';
  grid.querySelectorAll('[data-detail]').forEach(b=>b.addEventListener('click',()=>openProduct(products.find(p=>p.id===b.dataset.detail))));
  grid.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();addToCart(b.dataset.add);b.textContent='✓ به سبد اضافه شد';setTimeout(()=>b.textContent='افزودن به سبد 🛒',900)}));
@@ -51,6 +51,7 @@ overlay?.addEventListener('click',closeDrawer);
 document.querySelectorAll('.drawer a').forEach(a=>a.addEventListener('click',e=>{if(a.matches('[data-open-cart]'))return;closeDrawer()}));
 
 document.querySelectorAll('.category').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();document.querySelectorAll('.category').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeCategory=b.dataset.category;render()}));
+document.querySelectorAll('[data-menu-category]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();activeCategory=a.dataset.menuCategory;document.querySelectorAll('.category').forEach(x=>x.classList.toggle('active',x.dataset.category===activeCategory));render();closeDrawer();document.getElementById('products')?.scrollIntoView({behavior:'smooth',block:'start'});}));
 input?.addEventListener('input',render);
 clear?.addEventListener('click',()=>{input.value='';render();input.focus()});
 document.getElementById('productModal')?.querySelector('[data-modal-close]')?.addEventListener('click',closeProduct);
