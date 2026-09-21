@@ -58,13 +58,11 @@ document.querySelectorAll('.drawer a').forEach(a=>a.addEventListener('click',e=>
 document.querySelectorAll('.category').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();document.querySelectorAll('.category').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeCategory=b.dataset.category;render()}));
 input?.addEventListener('input',render);
 clear?.addEventListener('click',()=>{input.value='';render();input.focus()});
-document.getElementById('cartModal')?.querySelector('[data-cart-close]')?.addEventListener('click',closeCart);
-document.getElementById('cartModal')?.querySelector('[data-cart-overlay]')?.addEventListener('click',closeCart);
 document.getElementById('productModal')?.querySelector('[data-modal-close]')?.addEventListener('click',closeProduct);
 document.getElementById('productModal')?.querySelector('[data-modal-overlay]')?.addEventListener('click',closeProduct);
 document.querySelector('[data-qty-minus]')?.addEventListener('click',()=>{const q=document.querySelector('[data-qty]');q.value=Math.max(1,Number(q.value)-1)});
 document.querySelector('[data-qty-plus]')?.addEventListener('click',()=>{const m=document.getElementById('productModal'),p=products.find(x=>x.id===m.querySelector('[data-add-detail]').dataset.productId),q=m.querySelector('[data-qty]');q.value=Math.min(p.stock,Number(q.value)+1)});
-document.querySelector('[data-add-detail]')?.addEventListener('click',()=>{const m=document.getElementById('productModal'),p=products.find(x=>x.id===m.querySelector('[data-add-detail]').dataset.productId);addToCart(p.id,Number(m.querySelector('[data-qty]').value));closeProduct();openCart()});
+document.querySelector('[data-add-detail]')?.addEventListener('click',()=>{const m=document.getElementById('productModal'),p=products.find(x=>x.id===m.querySelector('[data-add-detail]').dataset.productId);addToCart(p.id,Number(m.querySelector('[data-qty]').value));closeProduct()});
 (function(){const c=document.querySelector('.cart-action>span');if(c)c.innerHTML='<svg class="cart-svg" viewBox="0 0 48 48"><path d="M7 9h5l4.2 22.5h21.6L42 16H13.2"></path><circle cx="20" cy="38" r="2.8"></circle><circle cx="35" cy="38" r="2.8"></circle></svg>';const a=document.querySelector('.round-action .account-icon');if(a)a.innerHTML='<svg class="account-svg" viewBox="0 0 48 48"><circle cx="24" cy="14.5" r="7.2"></circle><path d="M11 38.5c1.7-7.2 6.3-11 13-11s11.3 3.8 13 11"></path></svg>'})();
 if(window.DAIRY_SPRITE)document.documentElement.style.setProperty('--dairy-sprite-image','url("'+window.DAIRY_SPRITE+'")');loadCart();render();syncCart();
 
