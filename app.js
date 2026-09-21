@@ -48,7 +48,7 @@ function closeDrawer(){drawer?.classList.remove('open');overlay?.classList.remov
 document.getElementById('menuButton')?.addEventListener('click',()=>{drawer?.classList.add('open');overlay?.classList.add('show');drawer?.setAttribute('aria-hidden','false')});
 document.getElementById('drawerClose')?.addEventListener('click',closeDrawer);
 overlay?.addEventListener('click',closeDrawer);
-document.querySelectorAll('.drawer a').forEach(a=>a.addEventListener('click',e=>{if(a.matches('a[href="#cart"]'))return;closeDrawer()}));
+document.querySelectorAll('.drawer a').forEach(a=>a.addEventListener('click',e=>{if(a.matches('[data-open-cart]'))return;closeDrawer()}));
 
 document.querySelectorAll('.category').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();document.querySelectorAll('.category').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeCategory=b.dataset.category;render()}));
 input?.addEventListener('input',render);
