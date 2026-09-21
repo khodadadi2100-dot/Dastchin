@@ -1,29 +1,55 @@
 (function(){
 'use strict';
 
-var TRIGGERS='[data-open-cart], .cart-action, .bottom-nav a[href="#cart"], .drawer-main a[href="#cart"]';
+var SELECTOR='[data-open-cart], a[href="#cart"], .cart-action, .cart-icon';
 
 function byId(id){return document.getElementById(id)}
 
-function openCart(event){
-  if(event)event.preventDefault();
-  var modal=byId('cartModal');
-  if(!modal)return;
-  if(typeof window.renderCart==='function')window.renderCart();
+function forceModalVisible(modal){
   modal.classList.add('show');
   modal.setAttribute('aria-hidden','false');
+  modal.style.setProperty('display','block','important');
+  modal.style.setProperty('visibility','visible','important');
+  modal.style.setProperty('opacity','1','important');
+  modal.style.setProperty('pointer-events','auto','important');
+  modal.style.setProperty('z-index','2147483647','important');
   document.body.classList.add('cart-open');
   document.body.style.overflow='hidden';
 }
 
-function closeCart(event){
-  if(event)event.preventDefault();
+function openCart(event){
+  if(event){
+    event.preventDefault();
+    event.stopPropagation();
+  }
   var modal=byId('cartModal');
-  if(!modal)return;
+  if(!modal)return false;
+  try{
+    if(typeof window.renderCart==='function')window.renderCart();
+  }catch(err){
+    console.error('Dastchin cart render error:',err);
+  }
+  forceModalVisible(modal);
+  return false;
+}
+
+function closeCart(event){
+  if(event){
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  var modal=byId('cartModal');
+  if(!modal)return false;
   modal.classList.remove('show');
   modal.setAttribute('aria-hidden','true');
+  modal.style.removeProperty('display');
+  modal.style.removeProperty('visibility');
+  modal.style.removeProperty('opacity');
+  modal.style.removeProperty('pointer-events');
+  modal.style.removeProperty('z-index');
   document.body.classList.remove('cart-open');
   document.body.style.overflow='';
+  return false;
 }
 
 function closeCheckout(){
@@ -33,12 +59,25 @@ function closeCheckout(){
 }
 
 function money(value){
-  return Number(value).toLocaleString('fa-IR')+' تومان';
+  return Number(value||0).toLocaleString('fa-IR')+' تومان';
 }
 
-function checkout(){
-  var items=window.__dastchinGetCartItems?window.__dastchinGetCartItems():[];
-  if(!items.length){alert('سبد خرید خالی است');return;}
+function checkout(event){
+  if(event){
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  var items=[];
+  try{
+    items=window.__dastchinGetCartItems?window.__dastchinGetCartItems():[];
+  }catch(err){
+    console.error('Dastchin cart read error:',err);
+  }
+  if(!items.length){
+    alert('سبد خرید خالی است');
+    return false;
+  }
+
   closeCart();
   var old=byId('checkoutModal');
   if(old)old.remove();
@@ -67,17 +106,18 @@ function checkout(){
   document.body.style.overflow='hidden';
 
   modal.querySelectorAll('[data-checkout-close]').forEach(function(button){
-    button.addEventListener('click',closeCheckout);
+    button.addEventListener('click',function(e){e.preventDefault();closeCheckout()});
   });
 
-  modal.querySelector('form').addEventListener('submit',function(event){
-    event.preventDefault();
-    var form=new FormData(event.currentTarget);
+  var form=modal.querySelector('#checkoutForm');
+  if(form)form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var data=new FormData(form);
     var order={
       id:'DC-'+Date.now(),
       createdAt:new Date().toISOString(),
-      customer:Object.fromEntries(form.entries()),
-      items:items.map(function(item){return{id:item.product.id,name:item.product.name,qty:item.qty,price:item.product.price};}),
+      customer:Object.fromEntries(data.entries()),
+      items:items.map(function(item){return{id:item.product.id,name:item.product.name,qty:item.qty,price:item.product.price}}),
       total:total,
       status:'ثبت اولیه'
     };
@@ -86,30 +126,40 @@ function checkout(){
     modal.querySelector('.checkout-panel').innerHTML='<div class="order-success"><div>✓</div><h2>سفارش ثبت شد</h2><p>شماره سفارش: <strong>'+order.id+'</strong></p><p>سفارش شما برای ادامه فرایند آماده است.</p><button type="button" class="checkout-submit" id="finishOrder">بازگشت به فروشگاه</button></div>';
     modal.querySelector('#finishOrder').addEventListener('click',closeCheckout);
   });
+  return false;
 }
 
-function bind(){
-  var modal=byId('cartModal');
-  if(!modal)return;
+function handleClick(event){
+  var target=event.target;
+  if(!target||!target.closest)return;
 
-  document.querySelectorAll(TRIGGERS).forEach(function(trigger){
-    trigger.addEventListener('click',openCart);
-  });
+  var openTarget=target.closest(SELECTOR);
+  if(openTarget){
+    openCart(event);
+    return;
+  }
 
-  var closeButton=modal.querySelector('[data-cart-close]');
-  var overlay=modal.querySelector('[data-cart-overlay]');
-  var checkoutButton=modal.querySelector('.checkout-btn');
+  var closeTarget=target.closest('[data-cart-close],[data-cart-overlay]');
+  if(closeTarget){
+    closeCart(event);
+    return;
+  }
 
-  if(closeButton)closeButton.addEventListener('click',closeCart);
-  if(overlay)overlay.addEventListener('click',closeCart);
-  if(checkoutButton)checkoutButton.addEventListener('click',checkout);
+  var checkoutTarget=target.closest('.checkout-btn');
+  if(checkoutTarget){
+    checkout(event);
+  }
+}
 
+function init(){
+  document.addEventListener('click',handleClick,true);
   window.openDastchinCart=openCart;
   window.openCart=openCart;
   window.closeDastchinCart=closeCart;
   window.closeCart=closeCart;
+  document.documentElement.setAttribute('data-dastchin-cart-controller','ready');
 }
 
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
-else bind();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
+else init();
 })();
