@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-var SELECTOR='[data-open-cart], a[href="#cart"], .cart-action, .cart-icon';
+var SELECTOR='[data-open-cart], a[href="#cart"], a[href="#cartModal"], .cart-action, .cart-icon';
 
 function byId(id){return document.getElementById(id)}
 
@@ -153,6 +153,7 @@ function handleClick(event){
 
 function init(){
   document.addEventListener('click',handleClick,true);
+  document.addEventListener('pointerup',handleClick,true);
   window.openDastchinCart=openCart;
   window.openCart=openCart;
   window.closeDastchinCart=closeCart;
