@@ -22,8 +22,8 @@ let activeCategory='لبنیات';
 function normalize(v=''){return String(v).replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[۰-۹]/g,d=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[\s\-_/]+/g,' ').trim().toLowerCase()}
 function money(n){return Number(n).toLocaleString('fa-IR')+' تومان'}
 function cartCount(){return [...cartItems.values()].reduce((s,x)=>s+x.qty,0)}
-function persistCart(){localStorage.setItem(CART_KEY,JSON.stringify([...cartItems.values()].map(x=>({id:x.product.id,qty:x.qty}))))}
-function loadCart(){try{const saved=JSON.parse(localStorage.getItem(CART_KEY)||'[]');saved.forEach(x=>{const p=products.find(p=>p.id===x.id);if(p&&x.qty>0)cartItems.set(p.id,{product:p,qty:Math.min(p.stock,Number(x.qty))})})}catch(e){}}
+function persistCart(){try{localStorage.setItem(CART_KEY,JSON.stringify([...cartItems.values()].map(x=>({id:x.product.id,qty:x.qty}))))}catch(e){console.warn('Dastchin: cart could not be persisted',e)}}
+function loadCart(){try{const saved=JSON.parse(localStorage.getItem(CART_KEY)||'[]');if(!Array.isArray(saved))return;saved.forEach(x=>{const p=products.find(p=>p.id===x.id),qty=Number(x.qty);if(p&&Number.isFinite(qty)&&qty>0)cartItems.set(p.id,{product:p,qty:Math.min(p.stock,Math.floor(qty))})})}catch(e){console.warn('Dastchin: invalid saved cart',e)}}
 function syncCart(){const n=cartCount();if(count)count.textContent=n;if(bottomCount)bottomCount.textContent=n;if(drawerCount)drawerCount.textContent=n;persistCart();renderCart()}
 function addToCart(id,qty=1){const p=products.find(x=>x.id===id);if(!p||p.stock<1)return;const item=cartItems.get(id)||{product:p,qty:0};item.qty=Math.min(p.stock,item.qty+Math.max(1,Number(qty)||1));cartItems.set(id,item);syncCart();showCartFeedback()}
 function changeQty(id,delta){const item=cartItems.get(id);if(!item)return;item.qty=Math.max(0,Math.min(item.product.stock,item.qty+delta));if(!item.qty)cartItems.delete(id);syncCart()}
