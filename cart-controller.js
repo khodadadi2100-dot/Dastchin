@@ -32,6 +32,6 @@ function checkout(event){
   return false;
 }
 function handle(event){var t=event.target;if(!t||!t.closest)return;var open=t.closest(OPEN);if(open){openCart(event);return}var close=t.closest(CLOSE);if(close){closeCart(event);return}var checkoutButton=t.closest('.checkout-btn');if(checkoutButton)checkout(event)}
-function init(){document.addEventListener('click',handle,true);document.addEventListener('pointerup',handle,true);window.openDastchinCart=openCart;window.openCart=openCart;window.closeDastchinCart=closeCart;window.closeCart=closeCart;document.documentElement.setAttribute('data-dastchin-cart-controller','ready')}
+function init(){document.addEventListener('click',handle,true);document.addEventListener('pointerup',handle,true);window.openDastchinCart=openCart;window.openCart=openCart;window.closeDastchinCart=closeCart;window.closeCart=closeCart;window.openDastchinCheckout=checkout;document.documentElement.setAttribute('data-dastchin-cart-controller','ready')}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
