@@ -1,23 +1,42 @@
 (()=>{'use strict';
-const db=()=>window.dastchinSupabase,M=()=>document.getElementById('cartModal'),lock=x=>{document.body.style.overflow=x?'hidden':''},KEY='dastchin_guest_cart_v1';
+const db=()=>window.dastchinSupabase;
+const M=()=>document.getElementById('cartModal');
+const lock=x=>{document.body.style.overflow=x?'hidden':''};
+const KEY='dastchin_guest_cart_v1';
 let guest={};
-try{guest=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch{}
+let productReady=false;
+let busy=false;
+try{guest=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch{guest={}}
 const products=()=>window.dastchinProducts?.()||[];
 const money=v=>Number(v||0).toLocaleString('fa-IR')+' تومان';
-async function session(){const c=db();if(!c)return null;const r=await c.auth.getSession();return r.data?.session||null}
+const qtyValue=v=>Math.max(0,Math.floor(Number(v)||0));
 function persistGuest(){try{localStorage.setItem(KEY,JSON.stringify(guest))}catch(e){console.error(e)}}
+async function session(){
+ const c=db();if(!c)return null;
+ const r=await c.auth.getSession();
+ if(r.error)throw r.error;
+ return r.data?.session||null;
+}
+function currentProduct(id){return products().find(x=>x.id===String(id))||null}
 async function read(){
  const s=await session();
  if(s){
   const {data,error}=await db().from('cart_items').select('product_id,quantity').eq('user_id',s.user.id);
   if(error)throw error;
   const ps=products();
-  return (data||[]).map(x=>{const p=ps.find(y=>y.id===String(x.product_id));return p?{product:p,qty:Number(x.quantity)}:null}).filter(Boolean);
+  return (data||[]).map(x=>{
+   const p=ps.find(y=>y.id===String(x.product_id));
+   const q=qtyValue(x.quantity);
+   return p&&q>0?{product:p,qty:Math.min(p.stock,q)}:null;
+  }).filter(Boolean);
  }
- return Object.entries(guest).map(([id,qty])=>{const p=products().find(y=>y.id===id);return p?{product:p,qty:Number(qty)}:null}).filter(Boolean);
+ return Object.entries(guest).map(([id,q])=>{
+  const p=currentProduct(id),qty=qtyValue(q);
+  return p&&p.stock&&qty>0?{product:p,qty:Math.min(p.stock,qty)}:null;
+ }).filter(Boolean);
 }
 async function save(id,qty){
- id=String(id);qty=Math.max(0,Math.floor(Number(qty)||0));
+ id=String(id);qty=qtyValue(qty);
  const s=await session();
  if(s){
   const q=db();
@@ -32,30 +51,45 @@ async function save(id,qty){
 }
 async function mergeGuestIntoAccount(s){
  if(!s||!Object.keys(guest).length)return;
+ if(!productReady||!products().length)return;
+ const pending={...guest};
  const ps=products();
- for(const [id,rawQty] of Object.entries(guest)){
-  const p=ps.find(x=>x.id===id);if(!p||!p.stock)continue;
-  const qty=Math.min(p.stock,Math.max(1,Math.floor(Number(rawQty)||1)));
-  const {data,error}=await db().from('cart_items').select('id,quantity').eq('user_id',s.user.id).eq('product_id',Number(id)).maybeSingle();
-  if(error)throw error;
-  const next=Math.min(p.stock,Number(data?.quantity||0)+qty);
-  await save(id,next);
+ const failed=[];
+ for(const [id,rawQty] of Object.entries(pending)){
+  const p=ps.find(x=>x.id===id);
+  if(!p||!p.stock)continue;
+  try{
+   const qty=Math.min(p.stock,Math.max(1,qtyValue(rawQty)));
+   const {data,error}=await db().from('cart_items').select('id,quantity').eq('user_id',s.user.id).eq('product_id',Number(id)).maybeSingle();
+   if(error)throw error;
+   const next=Math.min(p.stock,qtyValue(data?.quantity)+qty);
+   await save(id,next);
+   delete guest[id];
+  }catch(err){failed.push(id);console.error('guest cart merge failed',id,err)}
  }
- guest={};persistGuest();
+ persistGuest();
+ if(failed.length)console.warn('Guest cart items kept for retry:',failed);
 }
 async function add(id,qty=1){
+ if(busy)return false;
+ busy=true;
  try{
-  const p=products().find(x=>x.id===String(id));
+  const p=currentProduct(id);
   if(!p||!p.stock){alert('این محصول موجود نیست.');return false}
-  const items=await read(),old=items.find(x=>x.product.id===String(id))?.qty||0;
-  await save(id,Math.min(p.stock,old+Math.max(1,Math.floor(Number(qty)||1))));
-  await renderCart();return true;
+  const items=await read();
+  const old=items.find(x=>x.product.id===String(id))?.qty||0;
+  const requested=Math.max(1,qtyValue(qty));
+  await save(id,Math.min(p.stock,old+requested));
+  await renderCart();
+  return true;
  }catch(err){console.error(err);alert('افزودن به سبد خرید انجام نشد. دوباره تلاش کنید.');return false}
+ finally{busy=false}
 }
 async function change(id,delta){
  try{
   const items=await read(),x=items.find(y=>y.product.id===String(id));if(!x)return;
-  await save(id,Math.max(0,Math.min(x.product.stock,x.qty+delta)));await renderCart();
+  await save(id,Math.max(0,Math.min(x.product.stock,x.qty+Number(delta||0))));
+  await renderCart();
  }catch(err){console.error(err);alert('تغییر تعداد انجام نشد. دوباره تلاش کنید.')}
 }
 async function remove(id){
@@ -72,21 +106,30 @@ async function renderCart(){
   box.querySelectorAll('[data-cart-remove]').forEach(b=>b.onclick=()=>remove(b.dataset.cartRemove));
   await badges(items);
  }catch(err){
-  console.error(err);box.innerHTML='<div class="cart-empty"><strong>خطا در دریافت سبد خرید</strong><span>اتصال فروشگاه را بررسی کنید و دوباره تلاش کنید.</span></div>';if(totalEl)totalEl.textContent=money(0);throw err;
+  console.error(err);
+  box.innerHTML='<div class="cart-empty"><strong>خطا در دریافت سبد خرید</strong><span>اتصال فروشگاه را بررسی کنید و دوباره تلاش کنید.</span></div>';
+  if(totalEl)totalEl.textContent=money(0);
+  throw err;
  }
 }
 async function badges(items){
- items=items||await read();const n=items.reduce((s,x)=>s+x.qty,0);
+ items=items||await read();
+ const n=items.reduce((s,x)=>s+x.qty,0);
  document.querySelectorAll('.cart-count,.cart-badge,[data-cart-count],#cartCount,#bottomCartCount,#drawerCartCount').forEach(x=>x.textContent=n.toLocaleString('fa-IR'));
  window.dastchinCartCount=n;
 }
 async function open(e){
- e?.preventDefault();e?.stopPropagation();const m=M();if(!m)return;
- document.getElementById('drawer')?.classList.remove('open');document.getElementById('overlay')?.classList.remove('show');
+ e?.preventDefault();e?.stopPropagation();
+ const m=M();if(!m)return;
+ document.getElementById('drawer')?.classList.remove('open');
+ document.getElementById('overlay')?.classList.remove('show');
  try{await renderCart()}catch(err){console.error(err)}
  m.classList.add('show');m.setAttribute('aria-hidden','false');lock(1);
 }
-function close(e){e?.preventDefault();e?.stopPropagation();M()?.classList.remove('show');M()?.setAttribute('aria-hidden','true');lock(0)}
+function close(e){
+ e?.preventDefault();e?.stopPropagation();
+ M()?.classList.remove('show');M()?.setAttribute('aria-hidden','true');lock(0);
+}
 async function checkout(e){
  e?.preventDefault();
  try{
@@ -97,31 +140,73 @@ async function checkout(e){
   const m=document.createElement('div');m.id='checkoutModal';m.className='checkout-modal';
   m.innerHTML='<div class="checkout-overlay" data-x></div><div class="checkout-panel" role="dialog" aria-modal="true"><div class="checkout-head"><h2>نهایی کردن سفارش</h2><button type="button" data-x>×</button></div><form id="cf"><label>آدرس تحویل<select name="address" required><option value="">در حال دریافت...</option></select></label><label>یادداشت<textarea name="note"></textarea></label><div class="checkout-total"><span>جمع سبد</span><strong>'+money(items.reduce((s,x)=>s+x.product.price*x.qty,0))+'</strong></div><button class="checkout-submit">ثبت سفارش</button><p class="checkout-note">پرداخت در این مرحله هنگام تحویل انجام می‌شود.</p></form></div>';
   document.body.appendChild(m);lock(1);m.querySelectorAll('[data-x]').forEach(x=>x.onclick=()=>{m.remove();lock(0)});
-  const sel=m.querySelector('[name=address]');const ar=await db().from('addresses').select('id,title,address,address_text,is_default').eq('user_id',s.user.id).order('is_default',{ascending:false}).order('id',{ascending:false});
+  const sel=m.querySelector('[name=address]');
+  const ar=await db().from('addresses').select('id,title,address,address_text,is_default').eq('user_id',s.user.id).order('is_default',{ascending:false}).order('id',{ascending:false});
   if(ar.error)throw ar.error;
   if(!ar.data?.length){sel.innerHTML='<option value="new">آدرس جدید</option>';const lab=document.createElement('label');lab.id='newAddressLabel';lab.innerHTML='آدرس کامل<textarea name="new_address" required></textarea>';sel.closest('label').after(lab)}
   else sel.innerHTML=ar.data.map(x=>'<option value="'+x.id+'">'+(x.title||'آدرس')+' — '+(x.address_text||x.address)+'</option>').join('');
   m.querySelector('#cf').onsubmit=async ev=>{
-   ev.preventDefault();const submit=m.querySelector('.checkout-submit');if(submit)submit.disabled=true;
+   ev.preventDefault();
+   const submit=m.querySelector('.checkout-submit');if(submit)submit.disabled=true;
    try{
     const f=new FormData(ev.currentTarget);let addressId=f.get('address');
-    if(addressId==='new'){const text=String(f.get('new_address')||'').trim();const z=await db().from('addresses').insert({user_id:s.user.id,title:'آدرس اصلی',address:text,address_text:text,is_default:true}).select('id').single();if(z.error)throw z.error;addressId=z.data.id}
+    if(addressId==='new'){
+     const text=String(f.get('new_address')||'').trim();if(!text)throw new Error('آدرس تحویل را وارد کنید.');
+     const z=await db().from('addresses').insert({user_id:s.user.id,title:'آدرس اصلی',address:text,address_text:text,is_default:true}).select('id').single();
+     if(z.error)throw z.error;addressId=z.data.id;
+    }
     const payload=items.map(x=>({product_id:Number(x.product.id),quantity:Number(x.qty)}));
     const z=await db().rpc('place_order',{p_address_id:Number(addressId),p_items:payload,p_payment_method:'cash_on_delivery',p_note:String(f.get('note')||'')||null});
     if(z.error)throw z.error;
-    const cleared=await db().from('cart_items').delete().eq('user_id',s.user.id);if(cleared.error)console.error(cleared.error);
+    const cleared=await db().from('cart_items').delete().eq('user_id',s.user.id);
+    if(cleared.error)throw cleared.error;
     m.querySelector('.checkout-panel').innerHTML='<div class="order-success"><div>✓</div><h2>سفارش ثبت شد</h2><p>شماره سفارش: <strong>'+z.data+'</strong></p><button class="checkout-submit" id="done">بازگشت به فروشگاه</button></div>';
-    m.querySelector('#done').onclick=()=>{m.remove();lock(0);window.dispatchEvent(new CustomEvent('dastchin:products-refresh'));renderCart()};
-   }catch(err){console.error(err);alert(err?.message||'ثبت سفارش انجام نشد. دوباره تلاش کنید.');if(submit)submit.disabled=false}
+    m.querySelector('#done').onclick=()=>{m.remove();lock(0);renderCart().catch(console.error)};
+   }catch(err){
+    console.error(err);alert(err?.message||'ثبت سفارش انجام نشد. دوباره تلاش کنید.');
+    if(submit)submit.disabled=false;
+   }
   };
- }catch(err){console.error(err);alert(err?.message||'ادامه ثبت سفارش انجام نشد. دوباره تلاش کنید.');const c=document.getElementById('checkoutModal');if(c)c.remove();lock(0)}
+ }catch(err){
+  console.error(err);alert(err?.message||'ادامه ثبت سفارش انجام نشد. دوباره تلاش کنید.');
+  const c=document.getElementById('checkoutModal');if(c)c.remove();lock(0);
+ }
 }
-document.addEventListener('click',e=>{if(e.target.closest('[data-open-cart]'))open(e);else if(e.target.closest('[data-cart-close],[data-cart-overlay]'))close(e);else if(e.target.closest('.checkout-btn'))checkout(e)});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){const c=document.getElementById('checkoutModal');if(c){c.remove();lock(0)}else close(e)}});
-window.dastchinAddToCart=add;window.renderCart=renderCart;window.dastchinCartItems=read;window.dastchinCartMoney=money;window.openDastchinCart=open;window.openDastchinCheckout=checkout;
-async function authRefresh(){try{const s=await session();if(s)await mergeGuestIntoAccount(s);await renderCart()}catch(err){console.error(err);try{await badges()}catch{}}}
+document.addEventListener('click',e=>{
+ if(e.target.closest('[data-open-cart]'))open(e);
+ else if(e.target.closest('[data-cart-close],[data-cart-overlay]'))close(e);
+ else if(e.target.closest('.checkout-btn'))checkout(e);
+});
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'){
+  const c=document.getElementById('checkoutModal');
+  if(c){c.remove();lock(0)}else close(e);
+ }
+});
+window.dastchinAddToCart=add;
+window.renderCart=renderCart;
+window.dastchinCartItems=read;
+window.dastchinCartMoney=money;
+window.openDastchinCart=open;
+window.openDastchinCheckout=checkout;
+async function authRefresh(){
+ try{
+  const s=await session();
+  if(s)await mergeGuestIntoAccount(s);
+  await renderCart();
+ }catch(err){
+  console.error(err);
+  try{await badges()}catch{}
+ }
+}
 window.addEventListener('dastchin:auth-changed',authRefresh);
 if(db()?.auth?.onAuthStateChange)db().auth.onAuthStateChange(()=>setTimeout(authRefresh,0));
-window.addEventListener('dastchin:products-refresh',()=>renderCart().catch(console.error));
-setTimeout(()=>renderCart().catch(console.error),0);
+window.addEventListener('dastchin:products-refresh',()=>{
+ productReady=true;
+ renderCart().catch(console.error);
+});
+setTimeout(()=>{
+ productReady=products().length>0;
+ renderCart().catch(console.error);
+},0);
 })();
