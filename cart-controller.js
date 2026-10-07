@@ -1,25 +1,127 @@
 (()=>{'use strict';
-const db=()=>window.dastchinSupabase,M=()=>document.getElementById('cartModal'),lock=x=>{document.body.style.overflow=x?'hidden':''},KEY='dastchin_guest_cart_v1';let guest={};
+const db=()=>window.dastchinSupabase,M=()=>document.getElementById('cartModal'),lock=x=>{document.body.style.overflow=x?'hidden':''},KEY='dastchin_guest_cart_v1';
+let guest={};
 try{guest=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch{}
 const products=()=>window.dastchinProducts?.()||[];
 const money=v=>Number(v||0).toLocaleString('fa-IR')+' تومان';
-async function session(){const c=db();if(!c)return null;return (await c.auth.getSession()).data.session}
+async function session(){const c=db();if(!c)return null;const r=await c.auth.getSession();return r.data?.session||null}
+function persistGuest(){try{localStorage.setItem(KEY,JSON.stringify(guest))}catch(e){console.error(e)}}
 async function read(){
  const s=await session();
- if(s){const {data,error}=await db().from('cart_items').select('product_id,quantity').eq('user_id',s.user.id);if(!error){const ps=products();return (data||[]).map(x=>{const p=ps.find(y=>y.id===String(x.product_id));return p?{product:p,qty:Number(x.quantity)}:null}).filter(Boolean)}}
- return Object.entries(guest).map(([id,qty])=>{const p=products().find(y=>y.id===id);return p?{product:p,qty:Number(qty)}:null}).filter(Boolean)
+ if(s){
+  const {data,error}=await db().from('cart_items').select('product_id,quantity').eq('user_id',s.user.id);
+  if(error)throw error;
+  const ps=products();
+  return (data||[]).map(x=>{const p=ps.find(y=>y.id===String(x.product_id));return p?{product:p,qty:Number(x.quantity)}:null}).filter(Boolean);
+ }
+ return Object.entries(guest).map(([id,qty])=>{const p=products().find(y=>y.id===id);return p?{product:p,qty:Number(qty)}:null}).filter(Boolean);
 }
-async function save(id,qty){id=String(id);qty=Math.max(0,Math.floor(Number(qty)||0));const s=await session();if(s){const q=db();if(qty===0){const z=await q.from('cart_items').delete().eq('user_id',s.user.id).eq('product_id',Number(id));if(z.error)throw z.error}else{const z=await q.from('cart_items').upsert({user_id:s.user.id,product_id:Number(id),quantity:qty,updated_at:new Date().toISOString()},{onConflict:'user_id,product_id'});if(z.error)throw z.error}}else{if(qty)guest[id]=qty;else delete guest[id];try{localStorage.setItem(KEY,JSON.stringify(guest))}catch{}}}
-async function add(id,qty=1){try{const p=products().find(x=>x.id===String(id));if(!p||!p.stock){alert('این محصول موجود نیست.');return}const items=await read(),old=items.find(x=>x.product.id===String(id))?.qty||0;await save(id,Math.min(p.stock,old+Math.max(1,Math.floor(Number(qty)||1))));await renderCart()}catch(err){console.error(err);alert('افزودن به سبد خرید انجام نشد. دوباره تلاش کنید.')}}
-async function renderCart(){const box=document.getElementById('cartItems'),totalEl=document.getElementById('cartTotal');if(!box)return;const items=await read();box.innerHTML=items.length?items.map(x=>'<article class="cart-item"><img src="'+x.product.image+'" alt="'+x.product.name+'"><div><strong>'+x.product.name+'</strong><small>'+x.product.weight+'</small><b>'+money(x.product.price*x.qty)+'</b></div><div class="cart-item-actions"><button type="button" data-cart-minus="'+x.product.id+'">−</button><span>'+x.qty.toLocaleString('fa-IR')+'</span><button type="button" data-cart-plus="'+x.product.id+'">+</button><button type="button" class="cart-remove" data-cart-remove="'+x.product.id+'">حذف</button></div></article>').join(''):'<div class="cart-empty"><strong>سبد خرید خالی است</strong><span>محصولی به سبد اضافه نشده.</span></div>';if(totalEl)totalEl.textContent=money(items.reduce((s,x)=>s+x.product.price*x.qty,0));box.querySelectorAll('[data-cart-minus]').forEach(b=>b.onclick=async()=>{const x=items.find(y=>y.product.id===b.dataset.cartMinus);await save(b.dataset.cartMinus,(x?.qty||1)-1);renderCart()});box.querySelectorAll('[data-cart-plus]').forEach(b=>b.onclick=async()=>{const x=items.find(y=>y.product.id===b.dataset.cartPlus);const p=x?.product;if(p)await save(b.dataset.cartPlus,Math.min(p.stock,(x.qty||0)+1));renderCart()});box.querySelectorAll('[data-cart-remove]').forEach(b=>b.onclick=async()=>{await save(b.dataset.cartRemove,0);renderCart()});await badges(items)}
-async function badges(items){items=items||await read();const n=items.reduce((s,x)=>s+x.qty,0);document.querySelectorAll('.cart-count,.cart-badge,[data-cart-count],#cartCount,#bottomCartCount,#drawerCartCount').forEach(x=>x.textContent=n.toLocaleString('fa-IR'));window.dastchinCartCount=n}
-async function open(e){e?.preventDefault();e?.stopPropagation();const m=M();if(!m)return;document.getElementById('drawer')?.classList.remove('open');document.getElementById('overlay')?.classList.remove('show');try{await renderCart();m.classList.add('show');m.setAttribute('aria-hidden','false');lock(1)}catch(err){console.error(err);m.classList.add('show');m.setAttribute('aria-hidden','false');lock(1);alert('سبد خرید باز شد، اما دریافت اطلاعات آن با خطا مواجه شد.')}}
+async function save(id,qty){
+ id=String(id);qty=Math.max(0,Math.floor(Number(qty)||0));
+ const s=await session();
+ if(s){
+  const q=db();
+  const z=qty===0
+   ? await q.from('cart_items').delete().eq('user_id',s.user.id).eq('product_id',Number(id))
+   : await q.from('cart_items').upsert({user_id:s.user.id,product_id:Number(id),quantity:qty,updated_at:new Date().toISOString()},{onConflict:'user_id,product_id'});
+  if(z.error)throw z.error;
+ }else{
+  if(qty)guest[id]=qty;else delete guest[id];
+  persistGuest();
+ }
+}
+async function mergeGuestIntoAccount(s){
+ if(!s||!Object.keys(guest).length)return;
+ const ps=products();
+ for(const [id,rawQty] of Object.entries(guest)){
+  const p=ps.find(x=>x.id===id);if(!p||!p.stock)continue;
+  const qty=Math.min(p.stock,Math.max(1,Math.floor(Number(rawQty)||1)));
+  const {data,error}=await db().from('cart_items').select('id,quantity').eq('user_id',s.user.id).eq('product_id',Number(id)).maybeSingle();
+  if(error)throw error;
+  const next=Math.min(p.stock,Number(data?.quantity||0)+qty);
+  await save(id,next);
+ }
+ guest={};persistGuest();
+}
+async function add(id,qty=1){
+ try{
+  const p=products().find(x=>x.id===String(id));
+  if(!p||!p.stock){alert('این محصول موجود نیست.');return false}
+  const items=await read(),old=items.find(x=>x.product.id===String(id))?.qty||0;
+  await save(id,Math.min(p.stock,old+Math.max(1,Math.floor(Number(qty)||1))));
+  await renderCart();return true;
+ }catch(err){console.error(err);alert('افزودن به سبد خرید انجام نشد. دوباره تلاش کنید.');return false}
+}
+async function change(id,delta){
+ try{
+  const items=await read(),x=items.find(y=>y.product.id===String(id));if(!x)return;
+  await save(id,Math.max(0,Math.min(x.product.stock,x.qty+delta)));await renderCart();
+ }catch(err){console.error(err);alert('تغییر تعداد انجام نشد. دوباره تلاش کنید.')}
+}
+async function remove(id){
+ try{await save(id,0);await renderCart()}catch(err){console.error(err);alert('حذف محصول انجام نشد. دوباره تلاش کنید.')}
+}
+async function renderCart(){
+ const box=document.getElementById('cartItems'),totalEl=document.getElementById('cartTotal');if(!box)return;
+ try{
+  const items=await read();
+  box.innerHTML=items.length?items.map(x=>'<article class="cart-item"><img src="'+(x.product.image||'assets/dastchin-logo.webp')+'" alt="'+x.product.name+'"><div><strong>'+x.product.name+'</strong><small>'+x.product.weight+'</small><b>'+money(x.product.price*x.qty)+'</b></div><div class="cart-item-actions"><button type="button" data-cart-minus="'+x.product.id+'">−</button><span>'+x.qty.toLocaleString('fa-IR')+'</span><button type="button" data-cart-plus="'+x.product.id+'">+</button><button type="button" class="cart-remove" data-cart-remove="'+x.product.id+'">حذف</button></div></article>').join(''):'<div class="cart-empty"><strong>سبد خرید خالی است</strong><span>محصولی به سبد اضافه نشده.</span></div>';
+  if(totalEl)totalEl.textContent=money(items.reduce((s,x)=>s+x.product.price*x.qty,0));
+  box.querySelectorAll('[data-cart-minus]').forEach(b=>b.onclick=()=>change(b.dataset.cartMinus,-1));
+  box.querySelectorAll('[data-cart-plus]').forEach(b=>b.onclick=()=>change(b.dataset.cartPlus,1));
+  box.querySelectorAll('[data-cart-remove]').forEach(b=>b.onclick=()=>remove(b.dataset.cartRemove));
+  await badges(items);
+ }catch(err){
+  console.error(err);box.innerHTML='<div class="cart-empty"><strong>خطا در دریافت سبد خرید</strong><span>اتصال فروشگاه را بررسی کنید و دوباره تلاش کنید.</span></div>';if(totalEl)totalEl.textContent=money(0);throw err;
+ }
+}
+async function badges(items){
+ items=items||await read();const n=items.reduce((s,x)=>s+x.qty,0);
+ document.querySelectorAll('.cart-count,.cart-badge,[data-cart-count],#cartCount,#bottomCartCount,#drawerCartCount').forEach(x=>x.textContent=n.toLocaleString('fa-IR'));
+ window.dastchinCartCount=n;
+}
+async function open(e){
+ e?.preventDefault();e?.stopPropagation();const m=M();if(!m)return;
+ document.getElementById('drawer')?.classList.remove('open');document.getElementById('overlay')?.classList.remove('show');
+ try{await renderCart()}catch(err){console.error(err)}
+ m.classList.add('show');m.setAttribute('aria-hidden','false');lock(1);
+}
 function close(e){e?.preventDefault();e?.stopPropagation();M()?.classList.remove('show');M()?.setAttribute('aria-hidden','true');lock(0)}
-async function checkout(e){e?.preventDefault();const s=await session();const items=await read();if(!items.length){alert('سبد خرید خالی است');return}if(!s){close();window.dastchinOpenAccount?.();alert('برای ثبت سفارش ابتدا وارد حساب کاربری شوید.');return}close();const m=document.createElement('div');m.id='checkoutModal';m.className='checkout-modal';m.innerHTML='<div class="checkout-overlay" data-x></div><div class="checkout-panel" role="dialog" aria-modal="true"><div class="checkout-head"><h2>نهایی کردن سفارش</h2><button type="button" data-x>×</button></div><form id="cf"><label>آدرس تحویل<select name="address" required><option value="">در حال دریافت...</option></select></label><label>یادداشت<textarea name="note"></textarea></label><div class="checkout-total"><span>جمع سبد</span><strong>'+money(items.reduce((s,x)=>s+x.product.price*x.qty,0))+'</strong></div><button class="checkout-submit">ثبت سفارش</button><p class="checkout-note">پرداخت در این مرحله هنگام تحویل انجام می‌شود.</p></form></div>';document.body.appendChild(m);lock(1);m.querySelectorAll('[data-x]').forEach(x=>x.onclick=()=>{m.remove();lock(0)});const sel=m.querySelector('[name=address]');const ar=await db().from('addresses').select('id,title,address,address_text,is_default').eq('user_id',s.user.id).order('is_default',{ascending:false}).order('id',{ascending:false});if(ar.error){alert(ar.error.message);m.remove();lock(0);return}if(!ar.data?.length){sel.innerHTML='<option value="new">آدرس جدید</option>';const lab=document.createElement('label');lab.id='newAddressLabel';lab.innerHTML='آدرس کامل<textarea name="new_address" required></textarea>';sel.closest('label').after(lab)}else sel.innerHTML=ar.data.map(x=>'<option value="'+x.id+'">'+(x.title||'آدرس')+' — '+(x.address_text||x.address)+'</option>').join('');
-m.querySelector('#cf').onsubmit=async ev=>{ev.preventDefault();const f=new FormData(ev.currentTarget);let addressId=f.get('address');if(addressId==='new'){const text=String(f.get('new_address')||'').trim();const z=await db().from('addresses').insert({user_id:s.user.id,title:'آدرس اصلی',address:text,address_text:text,is_default:true}).select('id').single();if(z.error){alert(z.error.message);return}addressId=z.data.id}const payload=items.map(x=>({product_id:Number(x.product.id),quantity:Number(x.qty)}));const z=await db().rpc('place_order',{p_address_id:Number(addressId),p_items:payload,p_payment_method:'cash_on_delivery',p_note:String(f.get('note')||'')||null});if(z.error){alert(z.error.message);return}await db().from('cart_items').delete().eq('user_id',s.user.id);m.querySelector('.checkout-panel').innerHTML='<div class="order-success"><div>✓</div><h2>سفارش ثبت شد</h2><p>شماره سفارش: <strong>'+z.data+'</strong></p><button class="checkout-submit" id="done">بازگشت به فروشگاه</button></div>';m.querySelector('#done').onclick=()=>{m.remove();lock(0);window.dispatchEvent(new CustomEvent('dastchin:products-refresh'));renderCart()}}}
+async function checkout(e){
+ e?.preventDefault();
+ try{
+  const s=await session(),items=await read();
+  if(!items.length){alert('سبد خرید خالی است');return}
+  if(!s){close();window.dastchinOpenAccount?.();alert('برای ثبت سفارش ابتدا وارد حساب کاربری شوید.');return}
+  close();
+  const m=document.createElement('div');m.id='checkoutModal';m.className='checkout-modal';
+  m.innerHTML='<div class="checkout-overlay" data-x></div><div class="checkout-panel" role="dialog" aria-modal="true"><div class="checkout-head"><h2>نهایی کردن سفارش</h2><button type="button" data-x>×</button></div><form id="cf"><label>آدرس تحویل<select name="address" required><option value="">در حال دریافت...</option></select></label><label>یادداشت<textarea name="note"></textarea></label><div class="checkout-total"><span>جمع سبد</span><strong>'+money(items.reduce((s,x)=>s+x.product.price*x.qty,0))+'</strong></div><button class="checkout-submit">ثبت سفارش</button><p class="checkout-note">پرداخت در این مرحله هنگام تحویل انجام می‌شود.</p></form></div>';
+  document.body.appendChild(m);lock(1);m.querySelectorAll('[data-x]').forEach(x=>x.onclick=()=>{m.remove();lock(0)});
+  const sel=m.querySelector('[name=address]');const ar=await db().from('addresses').select('id,title,address,address_text,is_default').eq('user_id',s.user.id).order('is_default',{ascending:false}).order('id',{ascending:false});
+  if(ar.error)throw ar.error;
+  if(!ar.data?.length){sel.innerHTML='<option value="new">آدرس جدید</option>';const lab=document.createElement('label');lab.id='newAddressLabel';lab.innerHTML='آدرس کامل<textarea name="new_address" required></textarea>';sel.closest('label').after(lab)}
+  else sel.innerHTML=ar.data.map(x=>'<option value="'+x.id+'">'+(x.title||'آدرس')+' — '+(x.address_text||x.address)+'</option>').join('');
+  m.querySelector('#cf').onsubmit=async ev=>{
+   ev.preventDefault();const submit=m.querySelector('.checkout-submit');if(submit)submit.disabled=true;
+   try{
+    const f=new FormData(ev.currentTarget);let addressId=f.get('address');
+    if(addressId==='new'){const text=String(f.get('new_address')||'').trim();const z=await db().from('addresses').insert({user_id:s.user.id,title:'آدرس اصلی',address:text,address_text:text,is_default:true}).select('id').single();if(z.error)throw z.error;addressId=z.data.id}
+    const payload=items.map(x=>({product_id:Number(x.product.id),quantity:Number(x.qty)}));
+    const z=await db().rpc('place_order',{p_address_id:Number(addressId),p_items:payload,p_payment_method:'cash_on_delivery',p_note:String(f.get('note')||'')||null});
+    if(z.error)throw z.error;
+    const cleared=await db().from('cart_items').delete().eq('user_id',s.user.id);if(cleared.error)console.error(cleared.error);
+    m.querySelector('.checkout-panel').innerHTML='<div class="order-success"><div>✓</div><h2>سفارش ثبت شد</h2><p>شماره سفارش: <strong>'+z.data+'</strong></p><button class="checkout-submit" id="done">بازگشت به فروشگاه</button></div>';
+    m.querySelector('#done').onclick=()=>{m.remove();lock(0);window.dispatchEvent(new CustomEvent('dastchin:products-refresh'));renderCart()};
+   }catch(err){console.error(err);alert(err?.message||'ثبت سفارش انجام نشد. دوباره تلاش کنید.');if(submit)submit.disabled=false}
+  };
+ }catch(err){console.error(err);alert(err?.message||'ادامه ثبت سفارش انجام نشد. دوباره تلاش کنید.');const c=document.getElementById('checkoutModal');if(c)c.remove();lock(0)}
 }
 document.addEventListener('click',e=>{if(e.target.closest('[data-open-cart]'))open(e);else if(e.target.closest('[data-cart-close],[data-cart-overlay]'))close(e);else if(e.target.closest('.checkout-btn'))checkout(e)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){const c=document.getElementById('checkoutModal');if(c){c.remove();lock(0)}else close(e)}});
 window.dastchinAddToCart=add;window.renderCart=renderCart;window.dastchinCartItems=read;window.dastchinCartMoney=money;window.openDastchinCart=open;window.openDastchinCheckout=checkout;
-window.addEventListener('dastchin:auth-changed',async()=>{const s=await session();if(s&&Object.keys(guest).length){for(const [id,qty] of Object.entries(guest)){try{await save(id,qty)}catch(e){console.error(e)}}guest={};try{localStorage.removeItem(KEY)}catch{}}renderCart();});window.addEventListener('dastchin:products-refresh',()=>renderCart());setTimeout(renderCart,0);
+async function authRefresh(){try{const s=await session();if(s)await mergeGuestIntoAccount(s);await renderCart()}catch(err){console.error(err);try{await badges()}catch{}}}
+window.addEventListener('dastchin:auth-changed',authRefresh);
+if(db()?.auth?.onAuthStateChange)db().auth.onAuthStateChange(()=>setTimeout(authRefresh,0));
+window.addEventListener('dastchin:products-refresh',()=>renderCart().catch(console.error));
+setTimeout(()=>renderCart().catch(console.error),0);
 })();
